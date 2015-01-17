@@ -26,6 +26,7 @@ rld <- rlog(dds)
 head(assay(rld))
 
 res <- data.frame(assay(rld) - assay(rld)[,"X5GB1_FM23_TR3"])
+res <- subset(res, select=-c(X5GB1_FM23_TR3))
 
 head(res)
 
