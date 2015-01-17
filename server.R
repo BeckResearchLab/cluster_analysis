@@ -21,8 +21,12 @@ magenta <- "#FF00FF"
 cyan <- "#00FFFF"
 grey <- "#AAAAAA"
 yellow <- "#FFD800"
-resmin <- min(res) - 1.5
-resmax <- max(res) + 1.5
+resmin <- min(res)
+resmax <- max(res)
+resPlotAdj <- 1.5
+rpkmmin <- min(rpkm[,names(d)])
+rpkmmax <- max(rpkm[,names(d)])
+rpkmPlotAdj <- 100
 cdf2cimin <- function(mycdf) {
         mycdf$x[which.min(abs(mycdf$Fhat - 0.05))]
 }
@@ -206,7 +210,8 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
 				theme_bw() +
 				theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.ticks = element_blank(), axis.text.x = element_blank()) +
   				annotation_custom(clusterGrob) +
-  				annotation_custom(clusterGrobGenes)
+  				annotation_custom(clusterGrobGenes) +
+				ylim(resmin - resPlotAdj, resmax + resPlotAdj)
 		}
 		if (!identical(focus, F)) {
 			print(clustres[focus,])
@@ -225,6 +230,5 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
 			geom_point(aes(y=mean), colour=cyan) + 
 			geom_line(aes(x=Sample, y=mean, group=1), colour=cyan) + 
 			geom_line(aes(x=Sample, y=min, group=1), colour=grey) + 
-			geom_line(aes(x=Sample, y=max, group=1), colour=grey) + 
-			ylim(resmin, resmax)
+			geom_line(aes(x=Sample, y=max, group=1), colour=grey)
 }

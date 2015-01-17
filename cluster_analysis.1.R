@@ -1,9 +1,9 @@
 
-rpkm <- read.delim("5G_rpkm_Cu.xls", header=T, row.names=1, sep="\t")
+rpkm <- read.delim("5G_rpkm.xls", header=T, row.names=1, sep="\t")
 head(rpkm)
 names(rpkm)
 
-d <- read.delim("5G_counts_Cu.xls", header=T, row.names=1, sep="\t")
+d <- read.delim("5G_counts.xls", header=T, row.names=1, sep="\t")
 head(d)
 names(d)
 d$product <- NULL
@@ -25,18 +25,7 @@ rld <- rlog(dds)
 
 head(assay(rld))
 
-res <- data.frame(FM40_T10m_TR3 = assay(rld)[,2] - assay(rld)[,1],
-	FM40_T40m_TR1 = assay(rld)[,3] - assay(rld)[,1],
-	FM40_T60m_TR1 = assay(rld)[,4] - assay(rld)[,1],
-	FM40_T90m_TR2 = assay(rld)[,5] - assay(rld)[,1],
-	FM40_T150m_TR1 = assay(rld)[,6] - assay(rld)[,1],
-	FM40_T180m_TR1 = assay(rld)[,7] - assay(rld)[,1],
-	FM34_T3_TR3_QC = assay(rld)[,9] - assay(rld)[,8],
-	FM34_T4_TR3_QC = assay(rld)[,10] - assay(rld)[,8],
-	FM34_T5_TR2_QC = assay(rld)[,11] - assay(rld)[,8],
-	FM34_T6_TR3_QC = assay(rld)[,12] - assay(rld)[,8],
-	FM34_T7_TR3_QC = assay(rld)[,13] - assay(rld)[,8],
-	FM34_T8_TR1_QC = assay(rld)[,14] - assay(rld)[,8])
+res <- data.frame(assay(rld) - assay(rld)[,"X5GB1_FM23_TR3"])
 
 head(res)
 
