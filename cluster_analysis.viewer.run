@@ -1,0 +1,3 @@
+#!/bin/bash
+
+R --no-save -e "shiny::runApp('cluster_analysis.viewer', port=4202)"
