@@ -1,23 +1,28 @@
+dat <- list (
+		file.sample_info="sample_info.xls",
+		file.rpkm="5G_rpkm.xls",
+		file.counts="5G_counts.xls",
+		reference.sample="FM23_TR3"
+	)
 
-rpkm <- read.delim("5G_rpkm.xls", header=T, row.names=1, sep="\t")
+sample_info <- read.delim(dat[["file.sample_info"]], header=T, row.names=1, sep="\t")
+head(sample_info)
+names(sample_info)
+
+rpkm <- read.delim(dat[["file.rpkm"]], header=T, row.names=1, sep="\t")
 head(rpkm)
 names(rpkm)
 
-d <- read.delim("5G_counts.xls", header=T, row.names=1, sep="\t")
+d <- read.delim(dat[["file.counts"]], header=T, row.names=1, sep="\t")
 head(d)
 names(d)
-d$product <- NULL
-head(d)
-split_names <- do.call(rbind, strsplit(names(d), '_'))[,2:3]
-short_names <- paste(split_names[,1], split_names[,2], sep='_')
-short_names
 
-names(rpkm)
-names(d)
+# integration test
 head(rpkm[,names(d)])
 
+# preprocess counts
 library(DESeq2)
-dexp <- data.frame(row.names=colnames(d), sample=c(names(d)), condition=c(short_names))
+dexp <- data.frame(row.names=colnames(d), sample=c(names(d)), condition=sample_info[names(d),"shortd"])
 dds <- DESeqDataSetFromMatrix(countData = d, colData = dexp, design = ~ condition)
 # collapse techincal replicates??!?!
 
@@ -25,8 +30,10 @@ rld <- rlog(dds)
 
 head(assay(rld))
 
-res <- data.frame(assay(rld) - assay(rld)[,"X5GB1_FM23_TR3"])
-res <- subset(res, select=-c(X5GB1_FM23_TR3))
+# normalize by reference sample log ratio
+res <- data.frame(assay(rld) - assay(rld)[,dat[["reference.sample"]]])
+# remove reference sample from count matrix
+res <- res[, !names(res) %in% dat[["reference.sample"]]]
 
 head(res)
 
