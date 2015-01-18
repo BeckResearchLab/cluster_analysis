@@ -29,6 +29,9 @@ dds <- DESeqDataSetFromMatrix(countData = d, colData = dexp, design = ~ conditio
 
 rld <- rlog(dds)
 
+env$deseq2.dds <- dds
+env$deseq2.rld <- rld
+
 head(assay(rld))
 
 # normalize by reference sample log ratio
@@ -42,6 +45,6 @@ head(res)
 env$sample.info <- sample_info
 env$rpkm <- rpkm
 env$cnts.raw <- d
-env$cnts.norm <- res
+env$log.ratio <- res
 
 save(env, file = "cluster_analysis.1.RData", compress=T)

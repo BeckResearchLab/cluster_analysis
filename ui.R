@@ -1,10 +1,10 @@
 library(shiny)
 
-load("cluster_analysis.2.RData")
+load("../cluster_analysis.2.RData")
 
 shinyUI(
 	navbarPage(
-		title = dat[["study.title"]],
+		title = env$study.title,
 
 		tabPanel("All k",
 			plotOutput("kDistSumPlot"),
@@ -15,7 +15,7 @@ shinyUI(
 			# K overview panes
 			fluidRow(
 				column(2, offset=5,
-					selectInput("k", "Choose k", clustEnsemble@k)
+					selectInput("k", "Choose k", env$cluster.ensemble@k)
 				)
 			),
 			hr(),

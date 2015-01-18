@@ -5,10 +5,10 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 
-load("cluster_analysis.2.RData")
+load("../cluster_analysis.2.RData")
 
 getDistSum <- function() {
-	x <- clustEnsemble
+	x <- env$cluster.ensemble
 	X <- x@k
 	Y <- sapply(x@models, function(z) info(z, "distsum"))
 	Z <- c(NA, diff(Y))
@@ -21,11 +21,11 @@ magenta <- "#FF00FF"
 cyan <- "#00FFFF"
 grey <- "#AAAAAA"
 yellow <- "#FFD800"
-resmin <- min(res)
-resmax <- max(res)
+resmin <- min(env$log.ratio)
+resmax <- max(env$log.ratio)
 resPlotAdj <- 1.5
-rpkmmin <- min(rpkm[,names(d)])
-rpkmmax <- max(rpkm[,names(d)])
+rpkmmin <- min(env$rpkm[,names(env$log.ratio)])
+rpkmmax <- max(env$rpkm[,names(env$log.ratio)])
 rpkmPlotAdj <- 100
 cdf2cimin <- function(mycdf) {
         mycdf$x[which.min(abs(mycdf$Fhat - 0.05))]
@@ -58,7 +58,7 @@ shinyServer(
 			input$k
 		})
 		kclust <- reactive({
-			clustEnsemble[[input$k]]
+			env$cluster.ensemble[[input$k]]
 		})
 		output$clusterSizePlot <- renderPlot({
 			csdf <- as.data.frame(table(kclust()@cluster))
@@ -151,34 +151,34 @@ shinyServer(
 
 getClusterSearchResults <- function(k, searchText) {
 		rowSelect <- union(
-				grep(searchText, rownames(rpkm), ignore.case=T),
-				grep(searchText, rpkm$product, ignore.case=T)
+				grep(searchText, rownames(env$rpkm), ignore.case=T),
+				grep(searchText, env$rpkm$product, ignore.case=T)
 			)
-		clusts <- clusters(clustEnsemble[[k]])
+		clusts <- clusters(env$cluster.ensemble[[k]])
 		clust <- clusts[rowSelect]
-		data.frame(locus_tag=names(clust), product=rpkm[names(clust),"product"], Cluster=clust)
+		data.frame(locus_tag=names(clust), product=env$rpkm[names(clust),"product"], Cluster=clust)
 }
 
 getClusterMembers <- function(k, cluster) {
-		clusts <- clusters(clustEnsemble[[k]])
+		clusts <- clusters(env$cluster.ensemble[[k]])
 		clust <- clusts[clusts==cluster]
-		data.frame(locus_tag=names(clust), product=rpkm[names(clust),"product"])
+		data.frame(locus_tag=names(clust), product=env$rpkm[names(clust),"product"])
 }
 
 getClusterMembersSpreadsheet <- function(k, cluster) {
-		clusts <- clusters(clustEnsemble[[k]])
+		clusts <- clusters(env$cluster.ensemble[[k]])
 		clust <- clusts[clusts==cluster]
 		data.frame(locus_tag=names(clust), 
-			product=rpkm[names(clust),"product"], 
-			rpkm[names(clust),2:length(names(rpkm))],
-			res[names(clust),]
+			product=env$rpkm[names(clust),"product"], 
+			env$rpkm[names(clust),2:length(names(env$rpkm))],
+			env$log.ratio[names(clust),]
 		)
 }
 
 makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
-		clusts <- clusters(clustEnsemble[[k]])
+		clusts <- clusters(env$cluster.ensemble[[k]])
 		clust <- clusts[clusts==cluster]
-		clustres <- res[names(clust),]
+		clustres <- env$log.ratio[names(clust),]
 		cmin<-apply(clustres, 2, min)
 		cmean<-apply(clustres, 2, mean)
 		cmax<-apply(clustres, 2, max)
@@ -214,14 +214,9 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
 				ylim(resmin - resPlotAdj, resmax + resPlotAdj)
 		}
 		if (!identical(focus, F)) {
-			print(clustres[focus,])
-			print(names(clustres[focus,]))
 			focusdf <- data.frame(t(clustres[focus,]), Sample=names(clustres))
 			names(focusdf)[1] <- 'y'
 			focusdf$Sample <- factor(focusdf$Sample, levels=names(clustres))
-			print(focusdf)
-			print(row.names(focusdf))
-			print(names(focusdf))
 			myplot <- myplot + 
 				geom_point(data=focusdf, aes(x=Sample, y=y, group=1), color=yellow) +
 				geom_line(data=focusdf, aes(x=Sample, y=y, group=1), color=yellow)
