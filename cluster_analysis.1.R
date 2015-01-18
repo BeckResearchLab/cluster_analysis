@@ -2,7 +2,8 @@ dat <- list (
 		file.sample_info="sample_info.xls",
 		file.rpkm="5G_rpkm.xls",
 		file.counts="5G_counts.xls",
-		reference.sample="FM23_TR3"
+		reference.sample="FM23_TR3",
+		study.title="5GB1"
 	)
 
 sample_info <- read.delim(dat[["file.sample_info"]], header=T, row.names=1, sep="\t")

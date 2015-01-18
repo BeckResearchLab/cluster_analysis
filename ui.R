@@ -4,7 +4,7 @@ load("cluster_analysis.2.RData")
 
 shinyUI(
 	navbarPage(
-		title = study_title,
+		title = dat[["study.title"]],
 
 		tabPanel("All k",
 			plotOutput("kDistSumPlot"),

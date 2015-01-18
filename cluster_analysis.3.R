@@ -4,7 +4,7 @@ load("cluster_analysis.2.RData")
 
 dat <- c(dat, 
 		path.to.meme="/home/dacb/meme/bin/meme", 
-		meme.base.args="-dna -maxsize 1000000 -evt 1e9 -minw 6 -maxw 25 -mod zoops",
+		meme.base.args="-dna -maxsize 1000000 -evt 1e10 -minw 6 -maxw 25 -mod zoops -nostatus -text",
 		meme.nmotifs=4,
 		meme.bfile="5G.genome.bfile"
 	)
@@ -38,8 +38,6 @@ for (i in 1:length(clustEnsemble@k)) {
 			}
 		}
 		meme.cmd <- paste(dat[["path.to.meme"]], fafile, "-nmotifs", dat[["meme.nmotifs"]], dat[["meme.base.args"]], "-oc", dir, "-bfile", dat[["meme.bfile"]])
-		output <- system(meme.cmd)
-		print(output)
 	}
 }
 warnings()
