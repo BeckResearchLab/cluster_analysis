@@ -1,0 +1,29 @@
+#!/bin/bash
+
+root=`pwd`
+
+meme_ins=`awk '{ print $2 }' meme.jobs`
+for meme_in in $meme_ins
+do
+	meme_wd=`echo $meme_in | sed "s/upstream.fa//g"`
+	meme_cmd=`awk -v meme_in="$meme_in" '{ if ($2 == meme_in) { print $0; exit } }' meme.jobs`
+	k=`echo $meme_wd | awk -F'/' '{ sub(".dir", "", $2); print $2 }'`
+	c=`echo $meme_wd | awk -F'/' '{ sub(".dir", "", $3); print $3 }'`
+	name=`echo "${k}_$c" | sed "s/cluster/c/g"`
+	echo $name
+	job=$meme_wd/meme.job
+	cat << EOF > $job
+#!/bin/bash
+
+#PBS -N "$name"
+#PBS -d $root
+#PBS -e $meme_wd/meme.err
+#PBS -o $meme_wd/meme.lot
+#PBS -l walltime=99:00:00,mem=8gb,nodes=1:ppn=8,feature=8core
+#PBS -W group_list=hyak-hackett
+
+$meme_cmd >& $meme_wd/meme.txt
+EOF
+	qsub $job
+
+done
