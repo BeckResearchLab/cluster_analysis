@@ -1,13 +1,52 @@
+library(flexclust)
 
 load("cluster_analysis.2.RData")
+
+dat <- c(dat, 
+		path.to.meme="/home/dacb/meme/bin/meme", 
+		meme.base.args="-dna -maxsize 1000000 -evt 1e9 -minw 6 -maxw 25 -mod zoops",
+		meme.nmotifs=4,
+		meme.bfile="5G.genome.bfile"
+	)
+
 
 # read in upstream sequences
 seqs_upstream <- read.delim("5G.upstream.tab", skip = 3, header = T, row.names = 1, sep='\t');
 head(seqs_upstream);
 
+# iterate over all k and clusters and produce a fasta for each
+# then run meme on the fasta
+root.dir <- 'cluster_analysis.dir'
+for (i in 1:length(clustEnsemble@k)) {
+	clusts <- clusters(clustEnsemble[[i]])
+	for (j in 1:clustEnsemble@k[i]) {
+		clust <- clusts[clusts==j]
+		clust_seqs_upstream <- seqs_upstream[names(clust),]
+		fafile <- 
+
+		# setup pathes for output
+		dir <- paste(root.dir, paste("k_", clustEnsemble[[i]]@k, ".dir/cluster_", j, ".dir", sep=""), sep="/")
+		dir.create(dir, recursive=T)
+		fafile <- paste(dir, "upstream.fa", sep="/")
+		if (file.exists(fafile)) {
+			file.remove(fafile);
+		}
+		for (k in 1:length(rownames(clust_seqs_upstream))) {
+			if (!is.na(clust_seqs_upstream$sequence[k])) {
+				cat(paste(">", rownames(clust_seqs_upstream)[k], "\n", sep="") , file=fafile, append=T)
+				cat(paste(clust_seqs_upstream$sequence[k], "\n", sep="") , file=fafile, append=T)
+			}
+		}
+		meme.cmd <- paste(dat[["path.to.meme"]], fafile, "-nmotifs", dat[["meme.nmotifs"]], dat[["meme.base.args"]], "-oc", dir, "-bfile", dat[["meme.bfile"]])
+		output <- system(meme.cmd)
+		print(output)
+	}
+}
+warnings()
+
 save.image("cluster_analysis.3.RData")
 
-exit()
+quit()
 library(genomeIntervals)
 library(IRanges)
 
