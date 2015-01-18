@@ -4,7 +4,7 @@ load("cluster_analysis.2.RData")
 
 shinyUI(
 	navbarPage(
-		title = "Pellet model",
+		title = study_title,
 
 		tabPanel("All k",
 			plotOutput("kDistSumPlot"),
