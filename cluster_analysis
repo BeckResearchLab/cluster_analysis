@@ -10,8 +10,10 @@ then
 	R --no-save < cluster_analysis.2.R #>& cluster_analysis.2.log
 fi
 
-#~/bcutil/bcutil get_upstream 5G.genbank.gff 5G.genome.fa -2 150 8 | awk -F'\t' '{ if (on) { printf(">%s\n%s\n", $1, $2); } if ($1 == "locus_tag") { on = 1; }  }' > 5G.upstream.fa
+# get the upstream sequences
 ~/bcutil/bcutil get_upstream 5G.genbank.gff 5G.genome.fa -2 150 8 > 5G.upstream.tab
+# create a background model from the entire genome
+~/meme/bin/fasta-get-markov -m 8 5G.genome.fa > 5G.genome.bfile
 
 if [ ! -e cluster_analysis.3.Rdata ]
 then
