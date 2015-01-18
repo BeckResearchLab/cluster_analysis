@@ -1,20 +1,20 @@
-dat <- list (
+env <- list (
+		study.title="5GB1",
 		file.sample_info="sample_info.xls",
 		file.rpkm="5G_rpkm.xls",
 		file.counts="5G_counts.xls",
-		reference.sample="FM23_TR3",
-		study.title="5GB1"
+		reference.sample="FM23_TR3"
 	)
 
-sample_info <- read.delim(dat[["file.sample_info"]], header=T, row.names=1, sep="\t")
+sample_info <- read.delim(env$file.sample_info, header=T, row.names=1, sep="\t")
 head(sample_info)
 names(sample_info)
 
-rpkm <- read.delim(dat[["file.rpkm"]], header=T, row.names=1, sep="\t")
+rpkm <- read.delim(env$file.rpkm, header=T, row.names=1, sep="\t")
 head(rpkm)
 names(rpkm)
 
-d <- read.delim(dat[["file.counts"]], header=T, row.names=1, sep="\t")
+d <- read.delim(env$file.counts, header=T, row.names=1, sep="\t")
 head(d)
 names(d)
 
@@ -32,10 +32,16 @@ rld <- rlog(dds)
 head(assay(rld))
 
 # normalize by reference sample log ratio
-res <- data.frame(assay(rld) - assay(rld)[,dat[["reference.sample"]]])
+res <- data.frame(assay(rld) - assay(rld)[,env$reference.sample])
 # remove reference sample from count matrix
-res <- res[, !names(res) %in% dat[["reference.sample"]]]
+res <- res[, !names(res) %in% env$reference.sample]
 
 head(res)
 
-save.image(file = "cluster_analysis.1.RData", compress=T)
+# update our environment object
+env$sample.info <- sample_info
+env$rpkm <- rpkm
+env$cnts.raw <- d
+env$cnts.norm <- res
+
+save(env, file = "cluster_analysis.1.RData", compress=T)
