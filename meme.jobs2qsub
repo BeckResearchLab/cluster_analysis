@@ -18,7 +18,7 @@ do
 #PBS -N "$name"
 #PBS -d $root
 #PBS -e $meme_wd/meme.err
-#PBS -o $meme_wd/meme.lot
+#PBS -o $meme_wd/meme.out
 #PBS -l walltime=99:00:00,mem=8gb,nodes=1:ppn=8,feature=8core
 #PBS -W group_list=hyak-hackett
 
