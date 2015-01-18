@@ -3,10 +3,11 @@ library(flexclust)
 load("cluster_analysis.2.RData")
 
 dat <- c(dat, 
-		path.to.meme="/home/dacb/meme/bin/meme", 
+		path.to.meme="meme", 
 		meme.base.args="-dna -maxsize 1000000 -evt 1e10 -minw 6 -maxw 25 -mod zoops -nostatus -text",
 		meme.nmotifs=4,
-		meme.bfile="5G.genome.bfile"
+		meme.bfile="5G.genome.bfile",
+		meme.jobs="meme.jobs"
 	)
 
 
@@ -16,6 +17,9 @@ head(seqs_upstream);
 
 # iterate over all k and clusters and produce a fasta for each
 # then run meme on the fasta
+if (file.exists(dat[["meme.jobs"]])) {
+	file.remove(dat[["meme.jobs"]])
+}
 root.dir <- 'cluster_analysis.dir'
 for (i in 1:length(clustEnsemble@k)) {
 	clusts <- clusters(clustEnsemble[[i]])
@@ -38,6 +42,7 @@ for (i in 1:length(clustEnsemble@k)) {
 			}
 		}
 		meme.cmd <- paste(dat[["path.to.meme"]], fafile, "-nmotifs", dat[["meme.nmotifs"]], dat[["meme.base.args"]], "-oc", dir, "-bfile", dat[["meme.bfile"]])
+		cat(meme.cmd, "\n", file=dat[["meme.jobs"]], append=T)
 	}
 }
 warnings()
