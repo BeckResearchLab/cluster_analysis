@@ -1,6 +1,6 @@
 library(shiny)
 
-load("../cluster_analysis.2.RData")
+load("../cluster_analysis.4.RData")
 
 shinyUI(
 	navbarPage(
@@ -47,13 +47,56 @@ shinyUI(
 					downloadButton('downloadClusterData', 'Download')
 				)
 			),
-			hr(),
 			fluidRow(
-				h4("Cluster ", textOutput("cluster", container = span), align="center"),
-				plotOutput("clusterProfilePlot")
+				column(12, hr())
 			),
 			fluidRow(
-				dataTableOutput('clusterMembers')
+				column(12, h4("Cluster ", textOutput("cluster", container = span), align="center"),
+					fluidRow(
+						column(12,
+							plotOutput("clusterProfilePlot")
+						)
+					)
+				)
+			),
+			fluidRow(
+				column(12, h4("Motifs", align="center"),
+					fluidRow(
+						column(width=3,
+							p("Motif 1", align="center"),
+							column(width=6, offset=3,
+								checkboxInput("displayMotif1GeneProfile", "Display profile", value=F)
+							),
+							plotOutput("clusterMotif1Plot", height="180px")
+						),
+						column(width=3,
+							p("Motif 2", align="center"),
+							column(width=6, offset=3,
+								checkboxInput("displayMotif2GeneProfile", "Display profile", value=F)
+							),
+							plotOutput("clusterMotif2Plot", height="180px")
+						),
+						column(width=3,
+							p("Motif 3", align="center"),
+							column(width=6, offset=3,
+								checkboxInput("displayMotif3GeneProfile", "Display profile", value=F)
+							),
+							plotOutput("clusterMotif3Plot", height="180px")
+						),
+						column(width=3,
+							p("Motif 4", align="center"),
+							column(width=6, offset=3,
+								checkboxInput("displayMotif4GeneProfile", "Display profile", value=F)
+							),
+							plotOutput("clusterMotif4Plot", height="180px")
+						)
+					)
+				)
+			),
+			fluidRow(
+				column(12,
+					dataTableOutput('clusterMembers')
+				)
 			)
 		),
 
@@ -64,7 +107,9 @@ shinyUI(
 					textInput("searchText", "Search:", "methane monooxygenase")
 				)
 			),
-			hr(),
+			fluidRow(
+				column(12, hr())
+			),
 			fluidRow(
 				h4(textOutput("clusterSearchResultSelectedRows", container = span), align="center"),
 				dataTableOutput('clusterSearchResults')

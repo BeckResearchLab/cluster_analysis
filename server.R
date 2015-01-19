@@ -5,8 +5,16 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 library(reshape2)
+library(seqLogo)
 
-load("../cluster_analysis.2.RData")
+# from https://stat.ethz.ch/pipermail/bioconductor/2010-September/035267.html
+#mySeqLogo = seqLogo::seqLogo
+# remove two poisonous lines that prevent multiple seqLogo plots
+#bad = (sapply( body(mySeqLogo), "==", "grid.newpage()") |
+#        sapply( body(mySeqLogo), "==", "par(ask = FALSE)"))
+#body(mySeqLogo)[bad] = NULL
+
+load("../cluster_analysis.4.RData")
 
 getDistSum <- function() {
 	x <- env$cluster.ensemble
@@ -100,8 +108,40 @@ shinyServer(
 			} else {
 				rowFocus <- input$clusterSelectedRows + 1
 			}
-			makeClusterProfilePlot(input$k, input$cluster, focus=rowFocus)
+			makeClusterProfilePlot(input$k, input$cluster, focus=rowFocus,
+				displayMotifGeneProfile=c(1:4)[
+					c(
+						input$displayMotif1GeneProfile,
+						input$displayMotif2GeneProfile,
+						input$displayMotif3GeneProfile,
+						input$displayMotif4GeneProfile
+					)
+				]
+			)
 		})
+		memes <- reactive({
+			env$meme.data[[input$k]][[input$cluster]]
+		})
+		output$clusterMotif1Plot <- renderPlot({
+			seqLogo(t(memes()[[1]]$pssm))
+		})
+		output$clusterMotif2Plot <- renderPlot({
+			seqLogo(t(memes()[[2]]$pssm))
+		})
+		output$clusterMotif3Plot <- renderPlot({
+			seqLogo(t(memes()[[3]]$pssm))
+		})
+		output$clusterMotif4Plot <- renderPlot({
+			seqLogo(t(memes()[[4]]$pssm))
+		})
+		# old way, variable plots
+		#	grid.newpage()
+		#	for (i in 1:length(memes())) {
+		#		pushViewport(viewport(x=(i*.25)-.125, y=0.5, width=0.25, height=1))
+		#		print(memes()[[i]]$pssm)
+		#		mySeqLogo(t(memes()[[i]]$pssm))
+		#		popViewport()
+		#	}
 		output$clusterMembers <- renderDataTable({
 			ns <- names(clust())
 			data.frame(locus_tag=ns, product=env$rpkm[ns,"product"])
@@ -172,7 +212,7 @@ getClusterSearchResults <- function(k, searchText) {
 		data.frame(locus_tag=names(gcsr_clust), product=env$rpkm[names(gcsr_clust),"product"], Cluster=gcsr_clust)
 }
 
-makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
+makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F, displayMotifGeneProfile=F) {
 		mcpp_clusts <- clusters(env$cluster.ensemble[[k]])
 		mcpp_clust <- mcpp_clusts[mcpp_clusts==cluster]
 		clustres <- env$log.ratio[names(mcpp_clust),]
@@ -217,6 +257,18 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
 			myplot <- myplot + 
 				geom_point(data=mdf, aes(x=Sample, y=value, group=variable), color=yellow) +
 				geom_line(data=mdf, aes(x=Sample, y=value, group=variable), color=yellow)
+		}
+		if (!identical(displayMotifGeneProfile, F) && length(displayMotifGeneProfile) > 0) {
+				motif_colors <- c("#d7191c", "#fdae61", "#abd9e9", "#2c7bb6")
+				memes <- env$meme.data[[k]][[cluster]]
+				for (m in 1:length(displayMotifGeneProfile)) {
+					motif <- memes[[displayMotifGeneProfile[m]]]
+					motifdf <- data.frame(t(clustres[motif$posns$gene,]), Sample=names(clustres))
+					mdf <- melt(motifdf, id.vars=c("Sample"))
+					myplot <- myplot + 
+						geom_point(data=mdf, aes(x=Sample, y=value, group=variable), color=motif_colors[displayMotifGeneProfile[m]]) +
+						geom_line(data=mdf, aes(x=Sample, y=value, group=variable), color=motif_colors[displayMotifGeneProfile[m]])
+				}
 		}
 		myplot +
 			geom_point(aes(y=mean), colour=cyan) + 
