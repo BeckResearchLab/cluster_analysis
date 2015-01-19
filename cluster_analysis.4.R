@@ -25,7 +25,7 @@ for (i in 1:length(env$cluster.ensemble@k)) {
 			warning(paste("meme.txt missing for k =", env$cluster.ensemble[[i]]@k, "cluster =", j))
 		}
 	}
-	meme.data[[as.character(i)]] <- meme.data.cluster
+	meme.data[[as.character(env$cluster.ensemble@k[i])]] <- meme.data.cluster
 }
 warnings()
 
