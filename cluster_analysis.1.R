@@ -5,6 +5,7 @@ env <- list (
 		file.rpkm="5G_rpkm.xls",
 		file.counts="5G_counts.xls",
 		reference.sample="FM23_TR3"
+		dir.output="cluster_analysis.dir"
 	)
 
 env$sample.info <- read.delim(env$file.sample.info, header=T, row.names=1, sep="\t")
