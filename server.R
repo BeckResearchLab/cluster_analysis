@@ -54,11 +54,11 @@ shinyServer(
 		})
 
 		# choose k tab
-		output$k <- renderText({
-			input$k
-		})
 		kclust <- reactive({
 			env$cluster.ensemble[[input$k]]
+		})
+		output$k <- renderText({
+			input$k
 		})
 		output$clusterSizePlot <- renderPlot({
 			csdf <- as.data.frame(table(kclust()@cluster))
@@ -69,14 +69,20 @@ shinyServer(
 				theme_bw()
 		})
 		output$clusterOverviewPlot <- renderPlot({
-			plot(kclust())
+			plot(kclust(), project=env$prcomp)
 		})
-		output$clusterProfileOverviewPlot <- renderPlot({
+		output$clusterProfileOverviewPlotArea <- renderPlot ({
 			profilePlots <- lapply(1:input$k, k=input$k, simple=T, makeClusterProfilePlot)
 			do.call(grid.arrange, c(profilePlots, list(ncol=3)))
 		})
 
 		# choose cluster tab
+		clusts <- reactive({
+			clusters(env$cluster.ensemble[[input$k]])
+		})
+		clust <- reactive({
+			clusts()[clusts()==input$cluster]
+		})
 		output$cluster <- renderText({
 			input$cluster
 		})
@@ -96,7 +102,8 @@ shinyServer(
 			makeClusterProfilePlot(input$k, input$cluster, focus=rowFocus)
 		})
 		output$clusterMembers <- renderDataTable({
-			getClusterMembers(input$k, input$cluster)
+			ns <- names(clust())
+			data.frame(locus_tag=ns, product=env$rpkm[ns,"product"])
 		}, options = list(paging = F),
 			callback = "function(table) {
       				table.on('click.dt', 'tr', function() {
@@ -109,8 +116,13 @@ shinyServer(
 		output$downloadClusterData <- downloadHandler(
 			filename = function() { paste("k", input$k, "_cluster", input$cluster, ".xls", sep='') },
 			content = function(file) {
+				ns <- names(clust())
 				write.table(
-					getClusterMembersSpreadsheet(input$k, input$cluster),
+					data.frame(locus_tag=ns, 
+						product=env$rpkm[ns,"product"], 
+						env$rpkm[ns,2:length(names(env$rpkm))],
+						env$log.ratio[ns,]
+					),
 					file, quote=F, sep='\t', row.names=F)
 			}
 		)
@@ -154,31 +166,15 @@ getClusterSearchResults <- function(k, searchText) {
 				grep(searchText, rownames(env$rpkm), ignore.case=T),
 				grep(searchText, env$rpkm$product, ignore.case=T)
 			)
-		clusts <- clusters(env$cluster.ensemble[[k]])
-		clust <- clusts[rowSelect]
-		data.frame(locus_tag=names(clust), product=env$rpkm[names(clust),"product"], Cluster=clust)
-}
-
-getClusterMembers <- function(k, cluster) {
-		clusts <- clusters(env$cluster.ensemble[[k]])
-		clust <- clusts[clusts==cluster]
-		data.frame(locus_tag=names(clust), product=env$rpkm[names(clust),"product"])
-}
-
-getClusterMembersSpreadsheet <- function(k, cluster) {
-		clusts <- clusters(env$cluster.ensemble[[k]])
-		clust <- clusts[clusts==cluster]
-		data.frame(locus_tag=names(clust), 
-			product=env$rpkm[names(clust),"product"], 
-			env$rpkm[names(clust),2:length(names(env$rpkm))],
-			env$log.ratio[names(clust),]
-		)
+		gcsr_clusts <- clusters(env$cluster.ensemble[[k]])
+		gcsr_clust <- gcsr_clusts[rowSelect]
+		data.frame(locus_tag=names(gcsr_clust), product=env$rpkm[names(gcsr_clust),"product"], Cluster=gcsr_clust)
 }
 
 makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
-		clusts <- clusters(env$cluster.ensemble[[k]])
-		clust <- clusts[clusts==cluster]
-		clustres <- env$log.ratio[names(clust),]
+		mcpp_clusts <- clusters(env$cluster.ensemble[[k]])
+		mcpp_clust <- mcpp_clusts[mcpp_clusts==cluster]
+		clustres <- env$log.ratio[names(mcpp_clust),]
 		cmin<-apply(clustres, 2, min)
 		cmean<-apply(clustres, 2, mean)
 		cmax<-apply(clustres, 2, max)
@@ -193,7 +189,7 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
 			clustdf <- data.frame(min=cmin, max=cmax, mean=cmean, lwr=lwr, upr=upr, Sample=names(cmean))
 			clustdf$Sample <- factor(clustdf$Sample, levels=names(cmean))
 			myplot <- ggplot(clustdf, aes(x=Sample)) + 
-				ggtitle(paste(paste("K =", k, ": Cluster", cluster, paste("(", length(clust), " genes)", sep="")), "Expression profile", sep="\n")) +
+				ggtitle(paste(paste("K =", k, ": Cluster", cluster, paste("(", length(mcpp_clust), " genes)", sep="")), "Expression profile", sep="\n")) +
 				ylab("Log2(Sample / T0)\nNormalized counts") +
 				geom_ribbon(aes(ymax=upr, ymin=lwr, group=1, alpha=0.7), colour=magenta) +
 				theme_bw() +
@@ -204,7 +200,7 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
 
 			# cluster label for center of plot
 			clusterGrob <- grobTree(textGrob(cluster, x=.5, y=.5, gp=gpar(col="black", fontsize=30)))
-			clusterGrobGenes <- grobTree(textGrob(paste(length(clust), "genes"), x=.5, y=.1, gp=gpar(col="black", fontsize=15)))
+			clusterGrobGenes <- grobTree(textGrob(paste(length(mcpp_clust), "genes"), x=.5, y=.1, gp=gpar(col="black", fontsize=15)))
 
 			myplot <- ggplot(clustdf, aes(x=Sample)) +
 				theme_bw() +

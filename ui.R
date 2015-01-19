@@ -32,7 +32,7 @@ shinyUI(
 			),
 			fluidRow(
 				h4("Cluster profile overview", align="center"),
-				plotOutput("clusterProfileOverviewPlot", height="800px")
+				plotOutput("clusterProfileOverviewPlotArea", height="1600px")
 			)
 		),
 
