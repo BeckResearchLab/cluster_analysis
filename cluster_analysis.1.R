@@ -1,30 +1,32 @@
 env <- list (
 		study.title="5GB1",
-		file.sample_info="sample_info.xls",
+		file.sample.info="sample_info.xls",
+		file.sample.ordering="sample_ordering.xls",
 		file.rpkm="5G_rpkm.xls",
 		file.counts="5G_counts.xls",
 		reference.sample="FM23_TR3"
 	)
 
-sample_info <- read.delim(env$file.sample_info, header=T, row.names=1, sep="\t")
-head(sample_info)
-names(sample_info)
+env$sample.info <- read.delim(env$file.sample.info, header=T, row.names=1, sep="\t")
+head(env$sample.info)
+names(env$sample.info)
+env$sample.ordering <- read.delim(env$file.sample.ordering, header=T, row.names=1, sep="\t")
 
-rpkm <- read.delim(env$file.rpkm, header=T, row.names=1, sep="\t")
-head(rpkm)
-names(rpkm)
+env$rpkm <- read.delim(env$file.rpkm, header=T, row.names=1, sep="\t")
+head(env$rpkm)
+names(env$rpkm)
 
-d <- read.delim(env$file.counts, header=T, row.names=1, sep="\t")
-head(d)
-names(d)
+env$cnts.raw <- read.delim(env$file.counts, header=T, row.names=1, sep="\t")
+head(env$cnts.raw)
+names(env$cnts.raw)
 
 # integration test
-head(rpkm[,names(d)])
+head(env$rpkm[,names(env$cnts.raw)])
 
 # preprocess counts
 library(DESeq2)
-dexp <- data.frame(row.names=colnames(d), sample=c(names(d)), condition=sample_info[names(d),"shortd"])
-dds <- DESeqDataSetFromMatrix(countData = d, colData = dexp, design = ~ condition)
+dexp <- data.frame(row.names=colnames(env$cnts.raw), sample=c(names(env$cnts.raw)), condition=env$sample.info[names(env$cnts.raw),"shortd"])
+dds <- DESeqDataSetFromMatrix(countData = env$cnts.raw, colData = dexp, design = ~ condition)
 # collapse techincal replicates??!?!
 
 rld <- rlog(dds)
@@ -42,10 +44,11 @@ res <- res[, !names(res) %in% env$reference.sample]
 head(res)
 
 # update our environment object
-env$sample.info <- sample_info
-env$rpkm <- rpkm
-env$cnts.raw <- d
 env$log.ratio <- res
+# create an ordering vector for just the samples in the log.ratio table
+env$sample.ordering <- rownames(env$sample.ordering)[rownames(env$sample.ordering) %in% names(env$log.ratio)]
+# reorder table mostly for viewing pleasure
+env$log.ratio <- env$log.ratio[, env$sample.ordering]
 
 library(MASS)
 # create MDS
@@ -55,5 +58,7 @@ dlr[dlr==0] <- 0.01
 mds.dim <- 2
 env$cmds <- cmdscale(dlr, mds.dim)
 env$mds <- isoMDS(dlr, env$cmds, mds.dim)
+# PCA
+env$prcomp <- prcomp(env$log.ratio)
 
 save(env, file = "cluster_analysis.1.RData", compress=T)
