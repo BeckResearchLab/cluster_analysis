@@ -28,7 +28,9 @@ shinyUI(
 			),
 			fluidRow(
 				h4("Clustering overview", align="center"),
-				plotOutput("clusterOverviewPlot")
+				p(align="center",
+					plotOutput("clusterOverviewPlot", width="600px", height="600px")
+				)
 			),
 			fluidRow(
 				h4("Cluster profile overview", align="center"),
