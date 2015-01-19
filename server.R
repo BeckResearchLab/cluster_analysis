@@ -136,6 +136,7 @@ shinyServer(
 						table.$('tr.selected').removeClass('selected');
         				$(this).toggleClass('selected');
         				Shiny.onInputChange('clusterSearchResultSelectedRow', table.rows('.selected').indexes().toArray());
+        				Shiny.onInputChange('clusterSelectedRow', null);
 
 						 tabs = $('.nav li')
 					 	 tabs.each(function() {
