@@ -1,4 +1,3 @@
-
 env <- list (
 		study.title="5GB1",
 		file.sample_info="sample_info.xls",
