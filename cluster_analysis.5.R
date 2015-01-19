@@ -24,12 +24,13 @@ for (i in 1:length(env$cluster.ensemble@k)) {
 		for (motif in memes) {
 			# new data frame from position table, fill in motif and with with rep
 			# compute xmin, xmax for easy ggplot viewing
+			uplen <- env$seqs.upstream[as.character(motif$posns$gene),"uplength"]
 			df <- data.frame(
 				cbind(motif$posns),
 				motif=rep(mi, length(motif$posns$gene)),
 				width=rep(motif$width, length(motif$posns$gene)),
-				xmin=motif$posns$start-150,
-				xmax=motif$posns$start+motif$width-150
+				xmin=motif$posns$start-uplen,
+				xmax=motif$posns$start+motif$width-uplen
 			)
 			sites[[as.character(mi)]] <- df
 			mi <- mi + 1
