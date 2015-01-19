@@ -13,7 +13,6 @@ for (i in 1:length(env$cluster.ensemble@k)) {
 	meme.data.cluster <- list()
 	for (j in 1:env$cluster.ensemble@k[i]) {
 		clust <- clusts[clusts==j]
-		clust_seqs_upstream <- env$seqs.upstream[names(clust),]
 
 		# setup pathes for input
 		dir <- paste(root.dir, paste("k_", env$cluster.ensemble[[i]]@k, ".dir/cluster_", j, ".dir", sep=""), sep="/")
