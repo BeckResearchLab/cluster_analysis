@@ -1,3 +1,0 @@
-#!/bin/bash
-
-rsync -avzh cluster_analysis.dir dacb@128.208.236.152:ShinyApps/cluster_analysis
