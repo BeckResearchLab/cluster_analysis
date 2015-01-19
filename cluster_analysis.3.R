@@ -18,7 +18,6 @@ head(env$seqs.upstream);
 if (file.exists(env$file.meme.jobs)) {
 	file.remove(env$file.meme.jobs)
 }
-root.dir <- 'cluster_analysis.dir'
 for (i in 1:length(env$cluster.ensemble@k)) {
 	clusts <- clusters(env$cluster.ensemble[[i]])
 	for (j in 1:env$cluster.ensemble@k[i]) {
@@ -26,7 +25,7 @@ for (i in 1:length(env$cluster.ensemble@k)) {
 		clust_seqs_upstream <- env$seqs.upstream[names(clust),]
 
 		# setup pathes for output
-		dir <- paste(root.dir, paste("k_", env$cluster.ensemble[[i]]@k, ".dir/cluster_", j, ".dir", sep=""), sep="/")
+		dir <- paste(env$dir.output, paste("k_", env$cluster.ensemble[[i]]@k, ".dir/cluster_", j, ".dir", sep=""), sep="/")
 		dir.create(dir, recursive=T)
 		fafile <- paste(dir, "upstream.fa", sep="/")
 		if (file.exists(fafile)) {
