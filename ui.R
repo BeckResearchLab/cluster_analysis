@@ -64,6 +64,7 @@ shinyUI(
 					fluidRow(
 						column(width=3,
 							p("Motif 1", align="center"),
+							p(textOutput("clusterMotif1Summary", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif1GeneProfile", "Display profile", value=F)
 							),
@@ -71,6 +72,7 @@ shinyUI(
 						),
 						column(width=3,
 							p("Motif 2", align="center"),
+							p(textOutput("clusterMotif2Summary", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif2GeneProfile", "Display profile", value=F)
 							),
@@ -78,6 +80,7 @@ shinyUI(
 						),
 						column(width=3,
 							p("Motif 3", align="center"),
+							p(textOutput("clusterMotif3Summary", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif3GeneProfile", "Display profile", value=F)
 							),
@@ -85,6 +88,7 @@ shinyUI(
 						),
 						column(width=3,
 							p("Motif 4", align="center"),
+							p(textOutput("clusterMotif4Summary", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif4GeneProfile", "Display profile", value=F)
 							),
