@@ -4,6 +4,7 @@ library(sROC)
 library(ggplot2)
 library(grid)
 library(gridExtra)
+library(reshape2)
 
 load("../cluster_analysis.2.RData")
 
@@ -94,10 +95,10 @@ shinyServer(
 			selectInput("cluster", "Choose cluster", clist, selected=csr[input$clusterSearchResultSelectedRow + 1, "Cluster"])
 		})
 		output$clusterProfilePlot <- renderPlot({
-			if (is.null(input$clusterSelectedRow)) {
+			if (is.null(input$clusterSelectedRows)) {
 				rowFocus <- F
 			} else {
-				rowFocus <- input$clusterSelectedRow + 1
+				rowFocus <- input$clusterSelectedRows + 1
 			}
 			makeClusterProfilePlot(input$k, input$cluster, focus=rowFocus)
 		})
@@ -107,9 +108,8 @@ shinyServer(
 		}, options = list(paging = F),
 			callback = "function(table) {
       				table.on('click.dt', 'tr', function() {
-						table.$('tr.selected').removeClass('selected');
         				$(this).toggleClass('selected');
-        				Shiny.onInputChange('clusterSelectedRow', table.rows('.selected').indexes().toArray());
+        				Shiny.onInputChange('clusterSelectedRows', table.rows('.selected').indexes().toArray());
 					});
 				}"
 		)
@@ -136,7 +136,7 @@ shinyServer(
 						table.$('tr.selected').removeClass('selected');
         				$(this).toggleClass('selected');
         				Shiny.onInputChange('clusterSearchResultSelectedRow', table.rows('.selected').indexes().toArray());
-        				Shiny.onInputChange('clusterSelectedRow', null);
+        				Shiny.onInputChange('clusterSelectedRows', null);
 
 						 tabs = $('.nav li')
 					 	 tabs.each(function() {
@@ -212,11 +212,11 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F) {
 		}
 		if (!identical(focus, F)) {
 			focusdf <- data.frame(t(clustres[focus,]), Sample=names(clustres))
-			names(focusdf)[1] <- 'y'
 			focusdf$Sample <- factor(focusdf$Sample, levels=names(clustres))
+			mdf <- melt(focusdf, id.vars=c("Sample"))
 			myplot <- myplot + 
-				geom_point(data=focusdf, aes(x=Sample, y=y, group=1), color=yellow) +
-				geom_line(data=focusdf, aes(x=Sample, y=y, group=1), color=yellow)
+				geom_point(data=mdf, aes(x=Sample, y=value, group=variable), color=yellow) +
+				geom_line(data=mdf, aes(x=Sample, y=value, group=variable), color=yellow)
 		}
 		myplot +
 			geom_point(aes(y=mean), colour=cyan) + 
