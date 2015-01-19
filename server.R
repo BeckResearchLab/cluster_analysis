@@ -275,7 +275,7 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F, displayMotifGe
 				memes <- env$meme.data[[k]][[cluster]]
 				for (m in 1:length(displayMotifGeneProfile)) {
 					motif <- memes[[displayMotifGeneProfile[m]]]
-					motifdf <- data.frame(t(clustres[motif$posns$gene,]), Sample=names(clustres))
+					motifdf <- data.frame(t(clustres[as.character(motif$posns$gene),]), Sample=names(clustres))
 					mdf <- melt(motifdf, id.vars=c("Sample"))
 					myplot <- myplot + 
 						geom_point(data=mdf, aes(x=Sample, y=value, group=variable), color=motif_colors[displayMotifGeneProfile[m]]) +
