@@ -1,4 +1,5 @@
 library(flexclust)
+library(ggplot2)
 
 load("cluster_analysis.4.RData")
 
@@ -45,13 +46,13 @@ for (i in 1:length(env$cluster.ensemble@k)) {
 			print(gene_file)
 			png(filename=gene_file, width=180, height=18)
 			ul <- env$seqs.upstream[as.character(g),"uplength"]
-			bps <- -ul+2
-			bpe <- 2
+			sline <- data.frame(x=c(-ul+2, 2), y=c(.5,.5))
+			#print(sline)
 			print(
-				ggplot(mscg, aes(xmin=xmin, xmax=xmax, ymin=0, ymax=1, fill=motif)) +
+				ggplot(mscg) +
 					scale_fill_manual(name="nmotif", values=motif.colors) +
-					geom_rect(aes(fill=motif))	+
-					geom_line(data=NULL, aes(x=c(bps, bpe), y=c(.5,.5), group=1), color="#000000") +
+					geom_rect(aes(xmin=xmin, xmax=xmax, ymin=0, ymax=1, fill=motif, group=1)) +
+					geom_line(data=sline, aes(x=x, y=y, group=1), color="#000000") +
 					theme(
 						legend.position = "none",
 						panel.background = element_blank(),
