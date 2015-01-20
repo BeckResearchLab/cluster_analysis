@@ -156,7 +156,10 @@ shinyServer(
 		#	}
 		output$clusterMembers <- renderDataTable({
 			ns <- names(clust())
-			data.frame(locus_tag=ns, product=env$rpkm[ns,"product"])
+			dir <- paste(env$dir.output, paste("k_", env$cluster.ensemble[[input$k]]@k, ".dir/cluster_", input$cluster, ".dir/motif_plots.dir", sep=""), sep="/")
+			motif_img <- paste("<img src='", paste("http://127.0.0.1:4202", dir, paste(ns, ".png", sep=""), sep="/"), "'></img>", sep="")
+			paste(motif_img)
+			data.frame(locus_tag=ns, product=env$rpkm[ns,"product"], motifs=motif_img)
 		}, options = list(paging = F),
 			callback = "function(table) {
       				table.on('click.dt', 'tr', function() {
