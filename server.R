@@ -102,13 +102,13 @@ shinyServer(
 			clist <- 1:input$k
 			# use a preselected cluster if available
 			csr <- getClusterSearchResults(input$k, input$searchText)
-			selectInput("cluster", "Choose cluster", clist, selected=csr[input$clusterSearchResultSelectedRow + 1, "Cluster"])
+			selectInput("cluster", "Choose cluster", clist, selected=csr[input$clusterSearchResultSelectedRow, "Cluster"])
 		})
 		output$clusterProfilePlot <- renderPlot({
 			if (is.null(input$clusterSelectedRows)) {
 				rowFocus <- F
 			} else {
-				rowFocus <- input$clusterSelectedRows + 1
+				rowFocus <- input$clusterSelectedRows
 			}
 			makeClusterProfilePlot(input$k, input$cluster, focus=rowFocus,
 				displayMotifGeneProfile=c(1:4)[
@@ -158,13 +158,17 @@ shinyServer(
 		#	}
 		output$clusterMembers <- renderDataTable({
 			ns <- names(clust())
+
+			# hierachical clustering of rows for row ordering
+			# could this be precomputed?
+			clustres <- env$log.ratio[ns,]
+			hclustres <- hclust(dist(clustres), method="complete")
+			ns <- ns[hclustres$order]
+
 			dir <- paste(env$dir.output, paste("k_", env$cluster.ensemble[[input$k]]@k, ".dir/cluster_", input$cluster, ".dir/motif_plots.dir", sep=""), sep="/")
 			motif_img <- paste("<img src='", paste("http://127.0.0.1:4202", dir, paste(ns, ".png", sep=""), sep="/"), "' alt=''></img>", sep="")
 			ms <- env$meme.sites[[input$k]][[input$cluster]]
 			for (n in 1:length(ns)) {
-				#print(ns[n])
-				#print(ms[as.character(ms$gene)==ns[n],])
-				print(dim(ms[ms$gene==ns[n],]))
 				if (dim(ms[ms$gene==ns[n],])[1] == 0) {
 					motif_img[n] <- ""
 				}
@@ -174,7 +178,14 @@ shinyServer(
 			callback = "function(table) {
       				table.on('click.dt', 'tr', function() {
         				$(this).toggleClass('selected');
-        				Shiny.onInputChange('clusterSelectedRows', table.rows('.selected').indexes().toArray());
+						var seldata = table.rows('.selected').indexes().toArray();
+						var data = table.rows('.selected').data().data();
+						var genes = [];
+						for (sel in seldata) {
+							genes.push(data[seldata[sel]][0])
+						}
+						console.log(genes);
+        				Shiny.onInputChange('clusterSelectedRows', genes);
 					});
 				}"
 		)
@@ -200,8 +211,15 @@ shinyServer(
       				table.on('click.dt', 'tr', function() {
 						table.$('tr.selected').removeClass('selected');
         				$(this).toggleClass('selected');
-        				Shiny.onInputChange('clusterSearchResultSelectedRow', table.rows('.selected').indexes().toArray());
-        				Shiny.onInputChange('clusterSelectedRows', null);
+						var seldata = table.rows('.selected').indexes().toArray();
+						var data = table.rows('.selected').data().data();
+						var genes = [];
+						for (sel in seldata) {
+							genes.push(data[seldata[sel]][0])
+						}
+						console.log(genes);
+        				Shiny.onInputChange('clusterSearchResultSelectedRow', genes);
+        				Shiny.onInputChange('clusterSelectedRows', genes);
 
 						 tabs = $('.nav li')
 					 	 tabs.each(function() {
@@ -222,7 +240,9 @@ shinyServer(
 		)
 		output$clusterSearchResultSelectedRows <- renderText({
 			csr <- getClusterSearchResults(input$k, input$searchText)
-    		paste(c('Cluster:', csr[input$clusterSearchResultSelectedRow + 1, "Cluster"]), collapse = ' ')
+			print(csr)
+			print(input$clusterSearchResultSelectedRow)
+    		paste(c('Cluster:', csr[input$clusterSearchResultSelectedRow, "Cluster"]), collapse = ' ')
   		})
 	}
 )
