@@ -14,7 +14,7 @@ library(seqLogo)
 #        sapply( body(mySeqLogo), "==", "par(ask = FALSE)"))
 #body(mySeqLogo)[bad] = NULL
 
-load("../cluster_analysis.4.RData")
+load("../cluster_analysis.5.RData")
 
 getDistSum <- function() {
 	x <- env$cluster.ensemble
@@ -42,6 +42,8 @@ cdf2cimin <- function(mycdf) {
 cdf2cimax <- function(mycdf) {
         mycdf$x[which.min(abs(mycdf$Fhat - 0.95))]
 }
+
+addResourcePath("cluster_analysis.dir", "/Users/dacb/work/5G/cluster_analysis/cluster_analysis.dir")
 
 shinyServer(
 	function(input, output) {
@@ -157,8 +159,16 @@ shinyServer(
 		output$clusterMembers <- renderDataTable({
 			ns <- names(clust())
 			dir <- paste(env$dir.output, paste("k_", env$cluster.ensemble[[input$k]]@k, ".dir/cluster_", input$cluster, ".dir/motif_plots.dir", sep=""), sep="/")
-			motif_img <- paste("<img src='", paste("http://127.0.0.1:4202", dir, paste(ns, ".png", sep=""), sep="/"), "'></img>", sep="")
-			paste(motif_img)
+			motif_img <- paste("<img src='", paste("http://127.0.0.1:4202", dir, paste(ns, ".png", sep=""), sep="/"), "' alt=''></img>", sep="")
+			ms <- env$meme.sites[[input$k]][[input$cluster]]
+			for (n in 1:length(ns)) {
+				#print(ns[n])
+				#print(ms[as.character(ms$gene)==ns[n],])
+				print(dim(ms[ms$gene==ns[n],]))
+				if (dim(ms[ms$gene==ns[n],])[1] == 0) {
+					motif_img[n] <- ""
+				}
+			}
 			data.frame(locus_tag=ns, product=env$rpkm[ns,"product"], motifs=motif_img)
 		}, options = list(paging = F),
 			callback = "function(table) {

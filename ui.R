@@ -1,6 +1,8 @@
 library(shiny)
 
-load("../cluster_analysis.4.RData")
+load("../cluster_analysis.5.RData")
+
+motif.colors <- c("#d7191c", "#fdae61", "#abd9e9", "#2c7bb6")
 
 shinyUI(
 	navbarPage(
@@ -65,7 +67,7 @@ shinyUI(
 				column(12, h4("Motifs", align="center"),
 					fluidRow(
 						column(width=3,
-							p("Motif 1", align="center"),
+							p(tags$b("Motif 1"), style=paste("color:", motif.colors[1], sep=" "), align="center"),
 							p(textOutput("clusterMotif1Summary", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif1GeneProfile", "Display profile", value=F)
@@ -73,7 +75,7 @@ shinyUI(
 							plotOutput("clusterMotif1Plot", height="180px")
 						),
 						column(width=3,
-							p("Motif 2", align="center"),
+							p(tags$b("Motif 2"), style=paste("color:", motif.colors[2], sep=" "), align="center"),
 							p(textOutput("clusterMotif2Summary", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif2GeneProfile", "Display profile", value=F)
@@ -81,7 +83,7 @@ shinyUI(
 							plotOutput("clusterMotif2Plot", height="180px")
 						),
 						column(width=3,
-							p("Motif 3", align="center"),
+							p(tags$b("Motif 3"), style=paste("color:", motif.colors[3], sep=" "), align="center"),
 							p(textOutput("clusterMotif3Summary", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif3GeneProfile", "Display profile", value=F)
@@ -89,7 +91,7 @@ shinyUI(
 							plotOutput("clusterMotif3Plot", height="180px")
 						),
 						column(width=3,
-							p("Motif 4", align="center"),
+							p(tags$b("Motif 4"), style=paste("color:", motif.colors[4], sep=" "), align="center"),
 							p(textOutput("clusterMotif4Summary", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif4GeneProfile", "Display profile", value=F)
