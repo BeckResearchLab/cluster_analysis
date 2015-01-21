@@ -122,6 +122,61 @@ shinyUI(
 				h4(textOutput("clusterSearchResultSelectedRows", container = span), align="center"),
 				dataTableOutput('clusterSearchResults')
 			)
+		),
+
+		tabPanel("My cluster",
+			# allow user to create their own cluster and run meme
+			fluidRow(
+				column(12, h4("Enter CDS locus tags:", align="center"))
+			),
+			fluidRow(
+				column(12, 
+					tags$textarea(id="mycluster.genes", rows=8, cols=32, "MBURv2_160308\nMBURv2_160304\nMBURv2_160312", style="display: block; margin-left: auto; margin-right: auto;")
+				)
+			),
+			fluidRow(
+				column(12, hr())
+			),
+			fluidRow(
+				column(12,
+					plotOutput("myClusterProfilePlot")
+				)
+			),
+			fluidRow(
+				column(12,
+					dataTableOutput('myClusterMembers')
+				)
+			)
+		),
+
+		tabPanel("BLASTn",
+			# allow user to run BLASTn
+			fluidRow(
+				column(12, h4("Enter nucleic acid sequences in FASTA format:", align="center"))
+			),
+			fluidRow(
+				column(12,
+					tags$textarea(id="blastn.input", rows=8, cols=100, ">reverse transcriptase upstream motif\nACCGATGCGTGATACTGGGGCGGAG\n", style="width: 600px; height: 150px; display: block; margin-left: auto; margin-right: auto;")
+				)
+			),
+			fluidRow(
+				column(12, hr())
+			)
+		),
+
+		tabPanel("BLASTp",
+			# allow user to run BLASTp
+			fluidRow(
+				column(12, h4("Enter protein sequences in FASTA format:", align="center"))
+			),
+			fluidRow(
+				column(12,
+					tags$textarea(id="blastp.input", rows=8, cols=100, ">MBURv2_160304\nMARPLIQMALDSLDFEQTVALAEQVAPYVDIFEIGTPCIKYNGVGLVKELRQRFPDQLLL\nVDLKTMDAGEYEAAPFYAAGADICTVLGVSGLATIGGVIKAARAHNAEVQVDLINVPDKV\nECARESAKLGAQIVGVHTGLDAQAAGQTPFADLQAIADLGLNVRVSVAGGIKQATVQQVV\nASGASIIVVGAAIYGAPSPAEAAREIRQLVDAASA\n", style="width: 600px; height: 150px; display: block; margin-left: auto; margin-right: auto;")
+				)
+			),
+			fluidRow(
+				column(12, hr())
+			)
 		)
 	)
 )

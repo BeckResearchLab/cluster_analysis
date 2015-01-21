@@ -244,6 +244,30 @@ shinyServer(
 			print(input$clusterSearchResultSelectedRow)
     		paste(c('Cluster:', csr[input$clusterSearchResultSelectedRow, "Cluster"]), collapse = ' ')
   		})
+		output$myClusterProfilePlot <- renderPlot({
+			makeMyClusterProfilePlot(unlist(strsplit(input$mycluster.genes, "\n", fixed=T)))
+		})
+		output$myClusterMembers <- renderDataTable({
+			ns <- unlist(strsplit(input$mycluster.genes, "\n", fixed=T))
+			# hierachical clustering of rows for row ordering
+			# could this be precomputed?
+			clustres <- env$log.ratio[ns,]
+			if (length(ns) > 1) {
+				hclustres <- hclust(dist(clustres), method="complete")
+				ns <- ns[hclustres$order]
+			}
+
+			#dir <- paste(env$dir.output, paste("k_", env$cluster.ensemble[[input$k]]@k, ".dir/cluster_", input$cluster, ".dir/motif_plots.dir", sep=""), sep="/")
+			#motif_img <- paste("<img src='", paste("http://127.0.0.1:4202", dir, paste(ns, ".png", sep=""), sep="/"), "' alt=''></img>", sep="")
+			#ms <- env$meme.sites[[input$k]][[input$cluster]]
+			#for (n in 1:length(ns)) {
+			#	if (dim(ms[ms$gene==ns[n],])[1] == 0) {
+			#		motif_img[n] <- ""
+			#	}
+			#}
+			data.frame(locus_tag=ns, product=env$rpkm[ns,"product"])
+			#, motifs=motif_img)
+		}, options = list(paging = F))
 	}
 )
 
@@ -255,6 +279,39 @@ getClusterSearchResults <- function(k, searchText) {
 		gcsr_clusts <- clusters(env$cluster.ensemble[[k]])
 		gcsr_clust <- gcsr_clusts[rowSelect]
 		data.frame(locus_tag=names(gcsr_clust), product=env$rpkm[names(gcsr_clust),"product"], Cluster=gcsr_clust)
+}
+
+makeMyClusterProfilePlot <- function(genes) {
+	clustres <- env$log.ratio[genes,]
+	genesdf <- data.frame(t(clustres), Sample=names(clustres))
+	genesdf$Sample <- factor(genesdf$Sample, levels=names(clustres))
+	mdf <- melt(genesdf, id.vars=c("Sample"))
+	if (length(genes) > 4) {	
+		cmin<-apply(clustres, 2, min)
+		cmean<-apply(clustres, 2, mean)
+		cmax<-apply(clustres, 2, max)
+		# estimate CDF from data
+		cis <- apply(clustres, 2, kCDF)
+		# get min at 95% CI
+		lwr <- sapply(cis, cdf2cimin)
+		# get max at 95% CI
+		upr <- sapply(cis, cdf2cimax)
+		# cluster data frame
+		clustdf <- data.frame(min=cmin, max=cmax, mean=cmean, lwr=lwr, upr=upr, Sample=names(cmean))
+		clustdf$Sample <- factor(clustdf$Sample, levels=names(cmean))
+		myplot <- ggplot(clustdf, aes(x=Sample)) + 
+			geom_ribbon(aes(ymax=upr, ymin=lwr, group=1, alpha=0.7), colour=magenta)
+	} else {
+		myplot <- ggplot(mdf, aes(x=Sample, y=value, group=variable))
+	}
+	myplot <- myplot +
+			geom_point(data=mdf, aes(x=Sample, y=value, group=variable), color=yellow) +
+			geom_line(data=mdf, aes(x=Sample, y=value, group=variable), color=yellow) +
+			ggtitle("Expression profile") +
+			ylab("Log2(Sample / T0)\nNormalized counts") +
+			theme_bw() +
+			theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position="none")
+	return(myplot)
 }
 
 makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F, displayMotifGeneProfile=F) {
