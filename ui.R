@@ -69,6 +69,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 1"), style=paste("color:", motif.colors[1], sep=" "), align="center"),
 							p(textOutput("clusterMotif1Summary", container = span), align="center"),
+							#p(textOutput("clusterMotif1Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif1GeneProfile", "Display profile", value=F)
 							),
@@ -77,6 +78,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 2"), style=paste("color:", motif.colors[2], sep=" "), align="center"),
 							p(textOutput("clusterMotif2Summary", container = span), align="center"),
+							#p(textOutput("clusterMotif2Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif2GeneProfile", "Display profile", value=F)
 							),
@@ -85,6 +87,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 3"), style=paste("color:", motif.colors[3], sep=" "), align="center"),
 							p(textOutput("clusterMotif3Summary", container = span), align="center"),
+							#p(textOutput("clusterMotif3Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif3GeneProfile", "Display profile", value=F)
 							),
@@ -93,6 +96,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 4"), style=paste("color:", motif.colors[4], sep=" "), align="center"),
 							p(textOutput("clusterMotif4Summary", container = span), align="center"),
+							#p(textOutput("clusterMotif4Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif4GeneProfile", "Display profile", value=F)
 							),

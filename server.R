@@ -127,11 +127,17 @@ shinyServer(
 		output$clusterMotif1Summary <- renderText({
 			paste("E-value:", memes()[[1]]$e.value, "- genes: ", length(memes()[[1]]$posns$gene))
 		})
+		output$clusterMotif1Consensus <- renderText({
+			paste("Consesus:", memes()[[1]]$consensus);
+		})
 		output$clusterMotif1Plot <- renderPlot({
 			seqLogo(t(memes()[[1]]$pssm))
 		})
 		output$clusterMotif2Summary <- renderText({
 			paste("E-value:", memes()[[2]]$e.value, "- genes: ", length(memes()[[2]]$posns$gene))
+		})
+		output$clusterMotif2Consensus <- renderText({
+			paste("Consesus:", memes()[[2]]$consensus);
 		})
 		output$clusterMotif2Plot <- renderPlot({
 			seqLogo(t(memes()[[2]]$pssm))
@@ -139,11 +145,17 @@ shinyServer(
 		output$clusterMotif3Summary <- renderText({
 			paste("E-value:", memes()[[3]]$e.value, "- genes: ", length(memes()[[3]]$posns$gene))
 		})
+		output$clusterMotif3Consensus <- renderText({
+			paste("Consesus:", memes()[[3]]$consensus);
+		})
 		output$clusterMotif3Plot <- renderPlot({
 			seqLogo(t(memes()[[3]]$pssm))
 		})
 		output$clusterMotif4Summary <- renderText({
 			paste("E-value:", memes()[[4]]$e.value, "- genes: ", length(memes()[[4]]$posns$gene))
+		})
+		output$clusterMotif4Consensus <- renderText({
+			paste("Consesus:", memes()[[4]]$consensus);
 		})
 		output$clusterMotif4Plot <- renderPlot({
 			seqLogo(t(memes()[[4]]$pssm))
