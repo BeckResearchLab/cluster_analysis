@@ -131,11 +131,33 @@ shinyUI(
 		tabPanel("My cluster",
 			# allow user to create their own cluster and run meme
 			fluidRow(
-				column(12, h4("Enter CDS locus tags:", align="center"))
-			),
-			fluidRow(
-				column(12, 
-					tags$textarea(id="mycluster.genes", rows=8, cols=32, "MBURv2_160308\nMBURv2_160304\nMBURv2_160312", style="display: block; margin-left: auto; margin-right: auto;")
+				column(3, offset=1,
+					column(12, 
+						h4("Enter CDS locus tags:", align="center"),
+						uiOutput("myClusterGenesUI")
+						#tags$textarea(id="myClusterGenes", rows=8, cols=32, "MBURv2_160308\nMBURv2_160304\nMBURv2_160312", style="display: block; margin-left: auto; margin-right: auto;")
+					)
+				),
+				column(6, offset=1,
+					column(12, 
+						column(12,
+							h4("Recruit", align="center"),
+							column(12,
+								column(6,
+									selectInput("myClusterRecruitN", "Choose number of genes to recruit", 1:10)
+								),
+								column(6,
+									radioButtons("myClusterRecruitBy", "Recruiting metric:",
+										c("Minimum distance to centroid" = "min2centroid",
+											"Minimum distance to any member" = "min2member",
+											"Random" = "random"))
+								)
+							),
+							column(2, offset=5,
+								actionButton("myClusterRecruitButton", "Recruit...")
+							)
+						)
+					)
 				)
 			),
 			fluidRow(
@@ -194,6 +216,17 @@ shinyUI(
 				),
 				column(12,
 					dataTableOutput('myClusterMembers')
+				)
+			),
+			fluidRow(
+				column(12,
+					h4("meme output", align="center")
+				),
+				column(12,
+					tags$code(
+						textOutput("myClusterMemeLog"),
+						style="white-space: pre;"
+					)
 				)
 			)
 		),

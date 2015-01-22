@@ -50,8 +50,12 @@ addResourcePath("cluster_analysis.dir", "/Users/dacb/work/5G/cluster_analysis/cl
 # this should really be setup in env!
 motif.colors <- c("#d7191c", "#fdae61", "#abd9e9", "#2c7bb6")
 
+# demo genes, could also just fetch first 4 (4 gets the kCDF display)
+# but these 3 make for a nice demo
+default.my.cluster.genes <- c("MBURv2_160308", "MBURv2_160304", "MBURv2_160312")
+
 shinyServer(
-	function(input, output) {
+	function(input, output, session) {
 		# all k tab
 		kdsdf <- getDistSum()
 		output$kDistSumPlot <- renderPlot({
@@ -260,8 +264,40 @@ shinyServer(
     		paste(c('Cluster:', csr[input$clusterSearchResultSelectedRow, "Cluster"]), collapse = ' ')
   		})
 		# My cluster tab
+		observe({
+			if (input$myClusterRecruitButton != 0) {
+				isolate({
+					other.log.ratio <- env$log.ratio[!rownames(env$log.ratio) %in% myClusterGenes(),]
+					switch(input$myClusterRecruitBy,
+						min2centroid = {
+								print("m2c")
+								new_genes <- c()
+							},
+						min2member = {
+								print("m2m")
+								new_genes <- c()
+							},
+						random = {
+								rrow <- sample(nrow(other.log.ratio), input$myClusterRecruitN)
+								new_genes <- rownames(other.log.ratio[rrow,])
+							},
+						{	# default case, report a warning
+							warning(paste("unhandled input$myClusterRecruitBy case:", input$myClusterRecruitBy))
+						}
+					)
+					# send a client side message about the update to the textarea which will cascade the whole tab
+					message <- list(
+						value=paste(paste(myClusterGenes(), collapse="\n"), paste(new_genes, collapse="\n"), sep="\n")
+					)
+					session$sendInputMessage("myClusterGenes", message)
+				})
+			}
+		})
 		myClusterGenes <- reactive({
-			unlist(strsplit(input$mycluster.genes, "\n", fixed=T))
+			if (!is.null(input$myClusterGenes)) {
+				return(unlist(strsplit(input$myClusterGenes, "\n", fixed=T)))
+			}
+			return(default.my.cluster.genes)
 		})
 		myClusterMemes <- reactive({
 			if (length(myClusterGenes()) > 1) {
@@ -288,6 +324,9 @@ shinyServer(
 				return(list("meme.data"=meme.data, "meme.sites"=meme.sites))
 			}
 			return(NULL)
+		})
+		output$myClusterGenesUI <- renderUI({
+			tags$textarea(id="myClusterGenes", rows=8, cols=32, paste(myClusterGenes(), collapse="\n"), style="display: block; margin-left: auto; margin-right: auto;")
 		})
 		output$myClusterProfilePlot <- renderPlot({
 			makeMyClusterProfilePlot(myClusterGenes(), myClusterMemes()$meme.data,
@@ -359,6 +398,13 @@ shinyServer(
 		})
 		output$myClusterMotif4Plot <- renderPlot({
 			seqLogo(t(myClusterMemes()$meme.data[[4]]$pssm))
+		})
+		output$myClusterMemeLog <- renderText({
+			# register reactivity with the gene list text area
+			input$myClusterGenes
+			dir <- paste(env$dir.output, "my_cluster.dir", sep="/")
+			meme_file <- paste(dir, "meme.txt", sep="/")
+			paste(readLines(meme_file), "\n")
 		})
 	}
 )
