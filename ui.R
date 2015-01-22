@@ -69,7 +69,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 1"), style=paste("color:", motif.colors[1], sep=" "), align="center"),
 							p(textOutput("clusterMotif1Summary", container = span), align="center"),
-							#p(textOutput("clusterMotif1Consensus", container = span), align="center"),
+							p(textOutput("clusterMotif1Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif1GeneProfile", "Display profile", value=F)
 							),
@@ -78,7 +78,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 2"), style=paste("color:", motif.colors[2], sep=" "), align="center"),
 							p(textOutput("clusterMotif2Summary", container = span), align="center"),
-							#p(textOutput("clusterMotif2Consensus", container = span), align="center"),
+							p(textOutput("clusterMotif2Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif2GeneProfile", "Display profile", value=F)
 							),
@@ -87,7 +87,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 3"), style=paste("color:", motif.colors[3], sep=" "), align="center"),
 							p(textOutput("clusterMotif3Summary", container = span), align="center"),
-							#p(textOutput("clusterMotif3Consensus", container = span), align="center"),
+							p(textOutput("clusterMotif3Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif3GeneProfile", "Display profile", value=F)
 							),
@@ -96,7 +96,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 4"), style=paste("color:", motif.colors[4], sep=" "), align="center"),
 							p(textOutput("clusterMotif4Summary", container = span), align="center"),
-							#p(textOutput("clusterMotif4Consensus", container = span), align="center"),
+							p(textOutput("clusterMotif4Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMotif4GeneProfile", "Display profile", value=F)
 							),
@@ -174,7 +174,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 1"), style=paste("color:", motif.colors[1], sep=" "), align="center"),
 							p(textOutput("myClusterMotif1Summary", container = span), align="center"),
-							#p(textOutput("myClusterMotif1Consensus", container = span), align="center"),
+							p(textOutput("myClusterMotif1Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMyMotif1GeneProfile", "Display profile", value=F)
 							),
@@ -183,7 +183,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 2"), style=paste("color:", motif.colors[2], sep=" "), align="center"),
 							p(textOutput("myClusterMotif2Summary", container = span), align="center"),
-							#p(textOutput("myClusterMotif2Consensus", container = span), align="center"),
+							p(textOutput("myClusterMotif2Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMyMotif2GeneProfile", "Display profile", value=F)
 							),
@@ -192,7 +192,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 3"), style=paste("color:", motif.colors[3], sep=" "), align="center"),
 							p(textOutput("myClusterMotif3Summary", container = span), align="center"),
-							#p(textOutput("myClusterMotif3Consensus", container = span), align="center"),
+							p(textOutput("myClusterMotif3Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMyMotif3GeneProfile", "Display profile", value=F)
 							),
@@ -201,7 +201,7 @@ shinyUI(
 						column(width=3,
 							p(tags$b("Motif 4"), style=paste("color:", motif.colors[4], sep=" "), align="center"),
 							p(textOutput("myClusterMotif4Summary", container = span), align="center"),
-							#p(textOutput("myClusterMotif4Consensus", container = span), align="center"),
+							p(textOutput("myClusterMotif4Consensus", container = span), align="center"),
 							column(width=6, offset=3,
 								checkboxInput("displayMyMotif4GeneProfile", "Display profile", value=F)
 							),
