@@ -7,6 +7,8 @@ library(gridExtra)
 library(reshape2)
 library(seqLogo)
 
+source("../memeIO.R")
+
 # from https://stat.ethz.ch/pipermail/bioconductor/2010-September/035267.html
 #mySeqLogo = seqLogo::seqLogo
 # remove two poisonous lines that prevent multiple seqLogo plots
@@ -44,6 +46,9 @@ cdf2cimax <- function(mycdf) {
 }
 
 addResourcePath("cluster_analysis.dir", "/Users/dacb/work/5G/cluster_analysis/cluster_analysis.dir")
+
+# this should really be setup in env!
+motif.colors <- c("#d7191c", "#fdae61", "#abd9e9", "#2c7bb6")
 
 shinyServer(
 	function(input, output) {
@@ -252,15 +257,53 @@ shinyServer(
 		)
 		output$clusterSearchResultSelectedRows <- renderText({
 			csr <- getClusterSearchResults(input$k, input$searchText)
-			print(csr)
-			print(input$clusterSearchResultSelectedRow)
     		paste(c('Cluster:', csr[input$clusterSearchResultSelectedRow, "Cluster"]), collapse = ' ')
   		})
+		# My cluster tab
+		myClusterGenes <- reactive({
+			unlist(strsplit(input$mycluster.genes, "\n", fixed=T))
+		})
+		myClusterMemes <- reactive({
+			if (length(myClusterGenes()) > 1) {
+				clust_seqs_upstream <- env$seqs.upstream[myClusterGenes(),]
+				dir <- paste(env$dir.output, "my_cluster.dir", sep="/")
+                dir.create(dir, recursive=T)
+                fafile <- paste(dir, "upstream.fa", sep="/")
+                if (file.exists(fafile)) {
+                        file.remove(fafile);
+                }
+                for (k in 1:length(rownames(clust_seqs_upstream))) {
+                        if (!is.na(clust_seqs_upstream$sequence[k])) {
+                                cat(paste(">", rownames(clust_seqs_upstream)[k], "\n", sep="") , file=fafile, append=T)
+                                cat(paste(clust_seqs_upstream$sequence[k], "\n", sep="") , file=fafile, append=T)
+                        }
+                }
+				meme_file <- paste(dir, "meme.txt", sep="/")
+                meme.cmd <- paste(env$path.to.meme, fafile, "-nmotifs", env$meme.nmotifs, env$meme.base.args, "-oc", dir, "-bfile", paste("..", env$file.meme.bfile, sep="/"), ">&", meme_file)
+				print(meme.cmd)
+				system(meme.cmd)
+				meme_text <- readLines(meme_file)
+				meme.data <- memeParse(meme_text)
+				meme.sites <- renderMotifPlots(paste(dir, "motif_plots.dir", sep="/"), myClusterGenes, meme.data)
+				return(list("meme.data"=meme.data, "meme.sites"=meme.sites))
+			}
+			return(NULL)
+		})
 		output$myClusterProfilePlot <- renderPlot({
-			makeMyClusterProfilePlot(unlist(strsplit(input$mycluster.genes, "\n", fixed=T)))
+			makeMyClusterProfilePlot(myClusterGenes(), myClusterMemes()$meme.data,
+				displayMotifGeneProfile=c(1:4)[
+					c(
+						input$displayMyMotif1GeneProfile,
+						input$displayMyMotif2GeneProfile,
+						input$displayMyMotif3GeneProfile,
+						input$displayMyMotif4GeneProfile
+					)
+				]
+			)
 		})
 		output$myClusterMembers <- renderDataTable({
-			ns <- unlist(strsplit(input$mycluster.genes, "\n", fixed=T))
+			ns <- myClusterGenes()
+			mcm <- myClusterMemes()
 			# hierachical clustering of rows for row ordering
 			# could this be precomputed?
 			clustres <- env$log.ratio[ns,]
@@ -269,17 +312,54 @@ shinyServer(
 				ns <- ns[hclustres$order]
 			}
 
-			#dir <- paste(env$dir.output, paste("k_", env$cluster.ensemble[[input$k]]@k, ".dir/cluster_", input$cluster, ".dir/motif_plots.dir", sep=""), sep="/")
-			#motif_img <- paste("<img src='", paste("http://127.0.0.1:4202", dir, paste(ns, ".png", sep=""), sep="/"), "' alt=''></img>", sep="")
-			#ms <- env$meme.sites[[input$k]][[input$cluster]]
-			#for (n in 1:length(ns)) {
-			#	if (dim(ms[ms$gene==ns[n],])[1] == 0) {
-			#		motif_img[n] <- ""
-			#	}
-			#}
-			data.frame(locus_tag=ns, product=env$rpkm[ns,"product"])
-			#, motifs=motif_img)
+			# put together path of the motif image for each gene
+			dir <- paste(env$dir.output, "my_cluster.dir", "motif_plots.dir", sep="/")
+			motif_img <- paste("<img src='", paste("http://127.0.0.1:4202", dir, paste(ns, ".png", sep=""), sep="/"), "' alt=''></img>", sep="")
+			# for genes with no sites, empty out the image url
+			ms <- mcm$meme.sites
+			for (n in 1:length(ns)) {
+				if (dim(ms[ms$gene==ns[n],])[1] == 0) {
+					motif_img[n] <- ""
+				}
+			}
+			data.frame(locus_tag=ns, product=env$rpkm[ns,"product"], motifs=motif_img)
 		}, options = list(paging = F))
+		output$myClusterMotif1Summary <- renderText({
+			paste("E-value:", myClusterMemes()$meme.data[[1]]$e.value, "- genes: ", length(myClusterMemes()$meme.data[[1]]$posns$gene))
+		})
+		output$myClusterMotif1Consensus <- renderText({
+			paste("Consesus:", myClusterMemes()$meme.data[[1]]$consensus);
+		})
+		output$myClusterMotif1Plot <- renderPlot({
+			seqLogo(t(myClusterMemes()$meme.data[[1]]$pssm))
+		})
+		output$myClusterMotif2Summary <- renderText({
+			paste("E-value:", myClusterMemes()$meme.data[[2]]$e.value, "- genes: ", length(myClusterMemes()$meme.data[[2]]$posns$gene))
+		})
+		output$myClusterMotif2Consensus <- renderText({
+			paste("Consesus:", myClusterMemes()$meme.data[[2]]$consensus);
+		})
+		output$myClusterMotif2Plot <- renderPlot({
+			seqLogo(t(myClusterMemes()$meme.data[[2]]$pssm))
+		})
+		output$myClusterMotif3Summary <- renderText({
+			paste("E-value:", myClusterMemes()$meme.data[[3]]$e.value, "- genes: ", length(myClusterMemes()$meme.data[[3]]$posns$gene))
+		})
+		output$myClusterMotif3Consensus <- renderText({
+			paste("Consesus:", myClusterMemes()$meme.data[[3]]$consensus);
+		})
+		output$myClusterMotif3Plot <- renderPlot({
+			seqLogo(t(myClusterMemes()$meme.data[[3]]$pssm))
+		})
+		output$myClusterMotif4Summary <- renderText({
+			paste("E-value:", myClusterMemes()$meme.data[[4]]$e.value, "- genes: ", length(myClusterMemes()$meme.data[[4]]$posns$gene))
+		})
+		output$myClusterMotif4Consensus <- renderText({
+			paste("Consesus:", myClusterMemes()$meme.data[[4]]$consensus);
+		})
+		output$myClusterMotif4Plot <- renderPlot({
+			seqLogo(t(myClusterMemes()$meme.data[[4]]$pssm))
+		})
 	}
 )
 
@@ -293,7 +373,7 @@ getClusterSearchResults <- function(k, searchText) {
 		data.frame(locus_tag=names(gcsr_clust), product=env$rpkm[names(gcsr_clust),"product"], Cluster=gcsr_clust)
 }
 
-makeMyClusterProfilePlot <- function(genes) {
+makeMyClusterProfilePlot <- function(genes, memes, displayMotifGeneProfile=F) {
 	clustres <- env$log.ratio[genes,]
 	genesdf <- data.frame(t(clustres), Sample=names(clustres))
 	genesdf$Sample <- factor(genesdf$Sample, levels=names(clustres))
@@ -323,6 +403,17 @@ makeMyClusterProfilePlot <- function(genes) {
 			ylab("Log2(Sample / T0)\nNormalized counts") +
 			theme_bw() +
 			theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position="none")
+	if (!identical(displayMotifGeneProfile, F) && length(displayMotifGeneProfile) > 0) {
+			for (m in 1:length(displayMotifGeneProfile)) {
+				motif <- memes[[displayMotifGeneProfile[m]]]
+				motifdf <- data.frame(t(clustres[as.character(motif$posns$gene),]), Sample=names(clustres))
+				motifdf$Sample <- factor(genesdf$Sample, levels=names(clustres))
+				mdf <- melt(motifdf, id.vars=c("Sample"))
+				myplot <- myplot + 
+					geom_point(data=mdf, aes(x=Sample, y=value, group=variable), color=motif.colors[displayMotifGeneProfile[m]]) +
+					geom_line(data=mdf, aes(x=Sample, y=value, group=variable), color=motif.colors[displayMotifGeneProfile[m]])
+			}
+	}
 	return(myplot)
 }
 
@@ -373,15 +464,15 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F, displayMotifGe
 				geom_line(data=mdf, aes(x=Sample, y=value, group=variable), color=yellow)
 		}
 		if (!identical(displayMotifGeneProfile, F) && length(displayMotifGeneProfile) > 0) {
-				motif_colors <- c("#d7191c", "#fdae61", "#abd9e9", "#2c7bb6")
 				memes <- env$meme.data[[k]][[cluster]]
 				for (m in 1:length(displayMotifGeneProfile)) {
 					motif <- memes[[displayMotifGeneProfile[m]]]
 					motifdf <- data.frame(t(clustres[as.character(motif$posns$gene),]), Sample=names(clustres))
+					motifdf$Sample <- factor(names(clustres), levels=names(clustres))
 					mdf <- melt(motifdf, id.vars=c("Sample"))
 					myplot <- myplot + 
-						geom_point(data=mdf, aes(x=Sample, y=value, group=variable), color=motif_colors[displayMotifGeneProfile[m]]) +
-						geom_line(data=mdf, aes(x=Sample, y=value, group=variable), color=motif_colors[displayMotifGeneProfile[m]])
+						geom_point(data=mdf, aes(x=Sample, y=value, group=variable), color=motif.colors[displayMotifGeneProfile[m]]) +
+						geom_line(data=mdf, aes(x=Sample, y=value, group=variable), color=motif.colors[displayMotifGeneProfile[m]])
 				}
 		}
 		myplot +
@@ -389,4 +480,60 @@ makeClusterProfilePlot <- function(k, cluster, simple=F, focus=F, displayMotifGe
 			geom_line(aes(x=Sample, y=mean, group=1), colour=cyan) + 
 			geom_line(aes(x=Sample, y=min, group=1), colour=grey) + 
 			geom_line(aes(x=Sample, y=max, group=1), colour=grey)
+}
+
+renderMotifPlots <- function(dir, genes, meme.data) {
+	dir.create(dir, recursive=T)
+	memes <- meme.data
+	sites <- list()
+	mi <- 1
+	for (motif in memes) {
+		# new data frame from position table, fill in motif and with with rep
+		# compute xmin, xmax for easy ggplot viewing
+		uplen <- env$seqs.upstream[as.character(motif$posns$gene),"uplength"]
+		df <- data.frame(
+			cbind(motif$posns),
+			motif=rep(mi, length(motif$posns$gene)),
+			width=rep(motif$width, length(motif$posns$gene)),
+			xmin=motif$posns$start-uplen,
+			xmax=motif$posns$start+motif$width-uplen
+		)
+		sites[[as.character(mi)]] <- df
+		mi <- mi + 1
+	}
+	msc <- do.call("rbind", sites)
+	msc$motif <- as.factor(msc$motif)
+	names(motif.colors) <- levels(msc$motif)
+	for (g in levels(msc$gene)) {
+		mscg <- msc[msc$gene==g,]
+		gene_file <- paste(dir, paste(g, "png", sep="."), sep="/")
+		png(filename=gene_file, width=180, height=18)
+		ul <- env$seqs.upstream[as.character(g),"uplength"]
+		sline <- data.frame(x=c(-ul+2, 2), y=c(.5,.5))
+		print(
+			ggplot(mscg) +
+				scale_fill_manual(name="nmotif", values=motif.colors) +
+				geom_rect(aes(xmin=xmin, xmax=xmax, ymin=0, ymax=1, fill=motif, group=1)) +
+				geom_line(data=sline, aes(x=x, y=y, group=1), color="#000000") +
+				theme(
+					legend.position = "none",
+					panel.background = element_blank(),
+					panel.grid.major = element_blank(),
+					panel.grid.minor = element_blank(),
+					panel.margin = unit(0,"null"),
+					plot.margin = rep(unit(0,"null"),4),
+					axis.ticks = element_blank(),
+					axis.text.x = element_blank(),
+					axis.text.y = element_blank(),
+					axis.title.x = element_blank(),
+					axis.title.y = element_blank(),
+					axis.ticks.length = unit(0,"null"),
+					axis.ticks.margin = unit(0,"null")
+				) +
+				labs(x=NULL, y=NULL) + 
+				xlim(-150,2) + ylim(0,1)
+		)
+		dev.off()
+	}
+	return(msc)
 }

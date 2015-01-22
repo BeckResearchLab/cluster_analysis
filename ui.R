@@ -147,6 +147,51 @@ shinyUI(
 				)
 			),
 			fluidRow(
+				column(12, h4("Motifs", align="center"),
+					fluidRow(
+						column(width=3,
+							p(tags$b("Motif 1"), style=paste("color:", motif.colors[1], sep=" "), align="center"),
+							p(textOutput("myClusterMotif1Summary", container = span), align="center"),
+							#p(textOutput("myClusterMotif1Consensus", container = span), align="center"),
+							column(width=6, offset=3,
+								checkboxInput("displayMyMotif1GeneProfile", "Display profile", value=F)
+							),
+							plotOutput("myClusterMotif1Plot", height="180px")
+						),
+						column(width=3,
+							p(tags$b("Motif 2"), style=paste("color:", motif.colors[2], sep=" "), align="center"),
+							p(textOutput("myClusterMotif2Summary", container = span), align="center"),
+							#p(textOutput("myClusterMotif2Consensus", container = span), align="center"),
+							column(width=6, offset=3,
+								checkboxInput("displayMyMotif2GeneProfile", "Display profile", value=F)
+							),
+							plotOutput("myClusterMotif2Plot", height="180px")
+						),
+						column(width=3,
+							p(tags$b("Motif 3"), style=paste("color:", motif.colors[3], sep=" "), align="center"),
+							p(textOutput("myClusterMotif3Summary", container = span), align="center"),
+							#p(textOutput("myClusterMotif3Consensus", container = span), align="center"),
+							column(width=6, offset=3,
+								checkboxInput("displayMyMotif3GeneProfile", "Display profile", value=F)
+							),
+							plotOutput("myClusterMotif3Plot", height="180px")
+						),
+						column(width=3,
+							p(tags$b("Motif 4"), style=paste("color:", motif.colors[4], sep=" "), align="center"),
+							p(textOutput("myClusterMotif4Summary", container = span), align="center"),
+							#p(textOutput("myClusterMotif4Consensus", container = span), align="center"),
+							column(width=6, offset=3,
+								checkboxInput("displayMyMotif4GeneProfile", "Display profile", value=F)
+							),
+							plotOutput("myClusterMotif4Plot", height="180px")
+						)
+					)
+				)
+			),
+			fluidRow(
+				column(12,
+					p(tags$br(), tags$b("NOTE: "), "rows in this table are not selectable", align="center")
+				),
 				column(12,
 					dataTableOutput('myClusterMembers')
 				)
