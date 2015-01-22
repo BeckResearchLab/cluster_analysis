@@ -6,6 +6,7 @@ library(grid)
 library(gridExtra)
 library(reshape2)
 library(seqLogo)
+library(pdist)
 
 source("../memeIO.R")
 
@@ -277,7 +278,14 @@ shinyServer(
 							},
 						min2member = {
 								print("m2m")
-								new_genes <- c()
+								pdm <- as.matrix(pdist(other.log.ratio, my.cluster.log.ratio))
+								# find the minimum for each row (gene to each member)
+								rmin <- t(sapply(seq(nrow(pdm)), function(i) {
+									j <- which.min(pdm[i,])
+									pdm[i,j]
+								}))
+								other.log.ratio$dist <- t(rmin)
+								new_genes <- rownames(other.log.ratio[order(other.log.ratio$dist),])[1:input$myClusterRecruitN]
 							},
 						random = {
 								rrow <- sample(nrow(other.log.ratio), input$myClusterRecruitN)
@@ -355,7 +363,8 @@ shinyServer(
 
 			# put together path of the motif image for each gene
 			dir <- paste(env$dir.output, "my_cluster.dir", "motif_plots.dir", sep="/")
-			motif_img <- paste("<img src='", paste("http://127.0.0.1:4202", dir, paste(ns, ".png", sep=""), sep="/"), "' alt=''></img>", sep="")
+			# use runif to append a random number to prevent all caching here
+			motif_img <- paste("<img src='", paste("http://127.0.0.1:4202", dir, paste(ns, ".png?", runif(1, min=0, max=10), sep=""), sep="/"), "' alt=''></img>", sep="")
 			# for genes with no sites, empty out the image url
 			ms <- mcm$meme.sites
 			for (n in 1:length(ns)) {
