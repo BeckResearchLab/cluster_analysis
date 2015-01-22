@@ -267,11 +267,13 @@ shinyServer(
 		observe({
 			if (input$myClusterRecruitButton != 0) {
 				isolate({
+					my.cluster.log.ratio <- env$log.ratio[myClusterGenes(),]
 					other.log.ratio <- env$log.ratio[!rownames(env$log.ratio) %in% myClusterGenes(),]
 					switch(input$myClusterRecruitBy,
 						min2centroid = {
-								print("m2c")
-								new_genes <- c()
+								cmean<-apply(my.cluster.log.ratio, 2, mean)
+								other.log.ratio$dist <- sqrt(rowSums(t(t(other.log.ratio)-cmean)^2))
+								new_genes <- rownames(other.log.ratio[order(other.log.ratio$dist),])[1:input$myClusterRecruitN]
 							},
 						min2member = {
 								print("m2m")
