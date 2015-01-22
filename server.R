@@ -417,6 +417,16 @@ shinyServer(
 			meme_file <- paste(dir, "meme.txt", sep="/")
 			paste(readLines(meme_file), "\n")
 		})
+
+		# blastn
+		output$blastnResults <- renderDataTable({
+			data.frame(BLASTn=c("disabled"), reason=c("insuffecient resources"))
+		}, options = list(paging=F))
+
+		# blastp
+		output$blastpResults <- renderDataTable({
+			data.frame(BLASTp=c("disabled"), reason=c("insuffecient resources"))
+		}, options = list(paging=F))
 	}
 )
 

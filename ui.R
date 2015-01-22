@@ -242,14 +242,29 @@ shinyUI(
 				)
 			),
 			fluidRow(
+				column(8, offset=3,
+					radioButtons("blastnDatabase", "BLASTn database:",
+						c("Upstream sequences (-150:2)" = "upstream",
+							"Features (CDS, tRNA, rRNA, etc.)" = "feature",
+							"Genome" = "genome"),
+						inline=T
+					)
+				)
+			),
+			fluidRow(
 				column(12, hr())
+			),
+			fluidRow(
+				column(12,
+					dataTableOutput("blastnResults")
+				)
 			)
 		),
 
 		tabPanel("BLASTp",
 			# allow user to run BLASTp
 			fluidRow(
-				column(12, h4("Enter protein sequences in FASTA format:", align="center"))
+				column(12, h4("Enter amino acid sequences in FASTA format:", align="center"))
 			),
 			fluidRow(
 				column(12,
@@ -258,6 +273,11 @@ shinyUI(
 			),
 			fluidRow(
 				column(12, hr())
+			),
+			fluidRow(
+				column(12,
+					dataTableOutput("blastpResults")
+				)
 			)
 		)
 	)
