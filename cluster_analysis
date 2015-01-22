@@ -20,3 +20,6 @@ then
 	R --no-save < cluster_analysis.3.R #>& cluster_analysis.3.log
 fi
 
+makeblastdb -in 5G.genome.fa -hash_index -dbtype nucl
+makeblastdb -in 5G.proteome.fa -hash_index -dbtype prot
+makeblastdb -in 5G.upstream.fa -hash_index -dbtype nucl
