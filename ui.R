@@ -190,7 +190,7 @@ shinyUI(
 					column(12, 
 						h4("Enter CDS locus tags:", 
 							bsActionButton("myClusterGenesLike", label = bsGlyph("icon-thumbs-up")),
-							bsTooltip("myClusterGenesLike", "Save the workflow that generated this 'My Cluster'", "top"),
+							bsTooltip("myClusterGenesLike", "Save the workflow that generated this cluster", "top"),
 							align="center"
 						),
 						uiOutput("myClusterGenesUI"),
@@ -204,7 +204,7 @@ shinyUI(
 							column(12,
 								column(6,
 									selectInput("myClusterRecruitN", "Choose number of genes to recruit", 1:10),
-									bsTooltip("myClusterRecruitN", "Choose the number of new genes to recruit to 'My Cluster'", "left")
+									bsTooltip("myClusterRecruitN", "Choose the number of new genes to recruit to this cluster", "left")
 								),
 								column(6,
 									radioButtons("myClusterRecruitBy", "Recruiting metric:",
