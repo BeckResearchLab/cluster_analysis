@@ -37,7 +37,7 @@ for (i in 1:length(env$cluster.ensemble@k)) {
 				cat(paste(clust_seqs_upstream$sequence[k], "\n", sep="") , file=fafile, append=T)
 			}
 		}
-		meme.cmd <- paste(env$path.to.meme, fafile, "-nmotifs", env$meme.nmotifs, env$meme.base.args, "-oc", dir, "-bfile", env$file.meme.bfile, ">&", paste(dir, "meme.txt", sep="/"))
+		meme.cmd <- paste(env$path.to.meme, fafile, "-nmotifs", env$meme.nmotifs, env$meme.base.args, "-oc", dir, "-bfile", env$file.meme.bfile, ">&", paste(dir, env$file.meme.txt, sep="/"))
 		cat(meme.cmd, "\n", file=env$file.meme.jobs, append=T)
 	}
 }

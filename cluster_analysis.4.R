@@ -15,7 +15,7 @@ for (i in 1:length(env$cluster.ensemble@k)) {
 
 		# setup pathes for input
 		dir <- paste(env$dir.output, paste("k_", env$cluster.ensemble[[i]]@k, ".dir/cluster_", j, ".dir", sep=""), sep="/")
-		meme_file <- paste(dir, "meme.txt", sep="/")
+		meme_file <- paste(dir, env$file.meme.txt, sep="/")
 		
 		# load the meme output file
 		if (file.exists(meme_file)) {
