@@ -1,9 +1,0 @@
-#PBS -N "monster_meme"
-#PBS -d /gscratch/esci/dacb/cluster_analysis
-#PBS -e meme.jobs.err
-#PBS -o meme.jobs.out
-#PBS -l walltime=99:00:00,mem=4gb,nodes=20:ppn=8,feature=8core
-#PBS -W group_list=hyak-esci
-
-cd /gscratch/esci/dacb/cluster_analysis
-parallel --jobs 8 --sshloginfile $PBS_NODEFILE --joblog progress.log --workdir $PWD < meme.jobs
