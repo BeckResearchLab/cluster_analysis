@@ -1,43 +1,20 @@
+# to be sourced
+
+# data loading, computation for caching
 source("env.samples.R")
 source("env.genes.R")
 source("env.cluster.ensemble.R")
 source("env.meme.data.R")
 source("env.meme.sites.R")
 
+# utility functions
 source("utilities.R")
 
+# create a new empty environment to hold all of our data
 env <- new.env(parent = emptyenv())
 
-env$study.title <- "5GB1"
-env$file.sample.info <- "sample_info.xls"
-env$file.sample.ordering <- "sample_ordering.xls"
-env$file.sample.tracks <- "sample_tracks.xls"
-env$file.rpkm <- "5G.rpkm.xls"
-env$file.counts <- "5G.counts.xls"
-env$reference.sample <- "FM23_TR3"
-env$file.genes.annotations <- "5G.annotations.xls"
-env$file.genes.upstream.seqs <- "5G.upstream.tab"
-env$upstream.start <- -1
-env$upstream.end <- -301
-env$dir.output <- "cluster_analysis.dir"
-env$flexclust.seed <- 8576
-env$flexclust.k.values <- c(seq(10, 150, by <- 10))
-env$flexclust.cores <- 8
-env$flexclust.nrep <- 8
-env$file.upstream.fa <- "upstream.fa"
-env$path.to.meme <- "meme"
-env$meme.base.args <- "-dna -maxsize 1000000 -evt 1e10 -minw 6 -maxw 25 -mod zoops -nostatus -text"
-env$meme.nmotifs <- 4
-env$file.meme.bfile <- "5G.upstream.bfile"
-env$file.meme.jobs <- "meme.jobs"
-env$file.meme.txt <- "meme.txt"
-env$motif.colors <- c("#d7191c", "#fdae61", "#abd9e9", "#2c7bb6")
-env$file.env.cache <- "env.cache.RData"
-env$file.env.sample.cache <- "env.sample.cache.RData"
-env$file.env.genes.cache <- "env.genes.cache.RData"
-env$file.env.cluster.ensemble.cache <- "env.cluster.ensemble.cache.RData"
-env$file.env.meme.data.cache <- "env.meme.data.cache.RData"
-env$file.env.meme.sites.cache <- "env.meme.sites.cache.RData"
+# load the environment configuration
+source("env.config.R")
 
 # include.meme: should the meme.data and meme.sites be loaded?
 env.assemble <- function(include.meme = T) {
