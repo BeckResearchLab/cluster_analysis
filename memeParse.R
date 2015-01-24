@@ -30,7 +30,8 @@ memeParse <- function(meme.filename, training.set = F) {
 	# note the fixed = T because we are grepping on a regex special character '*'
 	ts.end.line <- grep("********************************************************************************",
 		fixed = T,
-		meme.output[ts.start.line:length(meme.output)])[1] - 2 + ts.start.line
+		meme.output[ts.start.line:length(meme.output)]
+	)[1] - 2 + ts.start.line
 	file.training.set <- do.call(rbind,
 		lapply(strsplit(meme.output[ts.start.line:ts.end.line], "[\\t\\s]+", perl = T),
 			function (x) {
