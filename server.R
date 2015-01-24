@@ -8,16 +8,9 @@ library(reshape2)
 library(seqLogo)
 library(pdist)
 
-source("../memeIO.R")
+source("env.R")
 
-# from https://stat.ethz.ch/pipermail/bioconductor/2010-September/035267.html
-#mySeqLogo = seqLogo::seqLogo
-# remove two poisonous lines that prevent multiple seqLogo plots
-#bad = (sapply( body(mySeqLogo), "==", "grid.newpage()") |
-#        sapply( body(mySeqLogo), "==", "par(ask = FALSE)"))
-#body(mySeqLogo)[bad] = NULL
-
-load("../cluster_analysis.5.RData")
+env.assemble()
 
 getDistSum <- function() {
 	x <- env$cluster.ensemble
