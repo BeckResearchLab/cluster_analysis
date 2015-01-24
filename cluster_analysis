@@ -1,15 +1,5 @@
 #!/bin/bash
 
-if [ ! -e cluster_analysis.1.Rdata ]
-then
-	R --no-save < cluster_analysis.1.R #>& cluster_analysis.1.log
-fi
-
-if [ ! -e cluster_analysis.2.Rdata ]
-then
-	R --no-save < cluster_analysis.2.R #>& cluster_analysis.2.log
-fi
-
 # get the upstream sequences
 # old way, ATG + 149 bases
 #~/bcutil/bcutil get_upstream 5G.genbank.gff 5G.genome.fa -2 150 8 > 5G.upstream.tab
@@ -21,10 +11,8 @@ fi
 awk -F'\t' '{ printf(">%s\t%s\n", $1, $2) }' 5G.upstream.tab > 5G.upstream.fa
 ~/meme/bin/fasta-get-markov -m 8 5G.upstream.fa > 5G.upstream.bfile
 
-if [ ! -e cluster_analysis.3.Rdata ]
-then
-	R --no-save < cluster_analysis.3.R #>& cluster_analysis.3.log
-fi
+# create fasta files, this will also initiate the environment cache
+R --no-save < exportMemeFasta.R
 
 makeblastdb -in 5G.genome.fa -hash_index -dbtype nucl
 makeblastdb -in 5G.proteome.fa -hash_index -dbtype prot
