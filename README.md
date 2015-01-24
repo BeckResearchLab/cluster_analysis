@@ -8,7 +8,6 @@ Tools for expression based analyses of microorganisms
 Coding conventions:
 * env global in RData output has the main data items for a study
 * globals use . as word separator, e.g. env$meme.data
-* locals use _ as word separator, e.g. meme_data
 
 Dependencies:
 * MEME, 4.10.2 (important!)
