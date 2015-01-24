@@ -121,7 +121,7 @@ shinyServer(
 				rowFocus <- input$clusterSelectedRows
 			}
 			makeClusterProfilePlot(input$k, input$cluster, focus=rowFocus,
-				displayMotifGeneProfile=c(1:4)[
+				displayMotifGeneProfile=c(1:env$meme.nmotifs)[
 					c(
 						input$displayMotif1GeneProfile,
 						input$displayMotif2GeneProfile,
@@ -324,7 +324,7 @@ shinyServer(
                                 cat(paste(clust_seqs_upstream$sequence[k], "\n", sep="") , file=fafile, append=T)
                         }
                 }
-				meme_file <- paste(dir, "meme.txt", sep="/")
+				meme_file <- paste(dir, env$file.meme.txt, sep="/")
                 meme.cmd <- paste(env$path.to.meme, fafile, "-nmotifs", env$meme.nmotifs, env$meme.base.args, "-oc", dir, "-bfile", paste("..", env$file.meme.bfile, sep="/"), ">&", meme_file)
 				print(meme.cmd)
 				system(meme.cmd)
@@ -426,6 +426,11 @@ shinyServer(
 		# blastp
 		output$blastpResults <- renderDataTable({
 			data.frame(BLASTp=c("disabled"), reason=c("insuffecient resources"))
+		}, options = list(paging=F))
+
+		# likes
+		output$likesTable <- renderDataTable({
+			data.frame(ID=c("1421879893"), description=c("demonstration workflow showing recruitment to My Cluster by BLASTn of motif consensus"))
 		}, options = list(paging=F))
 	}
 )

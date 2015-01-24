@@ -354,6 +354,26 @@ shinyUI(
 					dataTableOutput("blastpResults")
 				)
 			)
+		),
+
+		tabPanel("Likes",
+			fluidRow(
+				column(12, h4("Collection of workflows for interesting results:", align="center"))
+			),
+			fluidRow(
+				column(12, hr())
+			),
+			fluidRow(
+				column(12, h2("This is under development", align="center"))
+			),
+			fluidRow(
+				column(12, hr())
+			),
+			fluidRow(
+				column(12,
+					dataTableOutput("likesTable")
+				)
+			)
 		)
 	)
 )
