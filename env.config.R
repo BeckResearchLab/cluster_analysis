@@ -40,7 +40,7 @@ env$file.meme.txt <- "meme.txt"
 
 # environment cache pathes
 env$file.env.cache <- "env.cache.RData"
-env$file.env.sample.cache <- "env.sample.cache.RData"
+env$file.env.samples.cache <- "env.samples.cache.RData"
 env$file.env.genes.cache <- "env.genes.cache.RData"
 env$file.env.cluster.ensemble.cache <- "env.cluster.ensemble.cache.RData"
 env$file.env.meme.data.cache <- "env.meme.data.cache.RData"
