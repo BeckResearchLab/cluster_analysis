@@ -2,9 +2,9 @@
 
 # return the directory path for a k / cluster pair
 dir.k.cluster <- function(dir.output, k, cluster, make.dir = F) {
-	dir <- sprintf("%s/k_%d.dir/cluster_%d.dir", dir.output, k, cluster)
+	dir <- sprintf("%s/k_%d.dir/cluster_%d.dir", dir.output, as.integer(k), as.integer(cluster))
 	# equivalent to to mkdir -p
-	if (make.dir) {
+	if (identical(make.dir, T)) {
 		dir.create(dir, recursive = T, showWarnings = F)
 	}
 	return(dir)
