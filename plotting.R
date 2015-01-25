@@ -53,7 +53,7 @@ print(head(profile.data))
 	genesdf <- data.frame(t(profile.data), Sample = names(profile.data))
 	genesdf$Sample <- factor(genesdf$Sample, levels = names(profile.data))
 	mdf <- melt(genesdf, id.vars = c("Sample"))
-	if (length(genes) > 5) {	
+	if (length(genes) > 4) {	
 		cmin<-apply(profile.data, 2, min)
 		cmean<-apply(profile.data, 2, mean)
 		cmax<-apply(profile.data, 2, max)
