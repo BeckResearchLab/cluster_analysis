@@ -31,25 +31,7 @@ env.meme.sites.setup <- function() {
 				next
 			}
 
-			sites <- list()
-			mi <- 1
-			for (motif in memes) {
-				# new data frame from position table, fill in motif and with with rep
-				# compute xmin, xmax for easy ggplot viewing
-				uplen <- env$genes$upstream.seqs[as.character(motif$positions$gene),"uplength"]
-				df <- data.frame(
-					cbind(motif$positions),
-					motif=rep(mi, length(motif$positions$gene)),
-					width=rep(motif$width, length(motif$positions$gene)),
-					xmin=motif$positions$start-uplen,
-					xmax=motif$positions$start+motif$width-uplen
-				)
-				sites[[as.character(mi)]] <- df
-				mi <- mi + 1
-			}
-			msc <- do.call("rbind", sites)
-			msc$motif <- as.factor(msc$motif)
-			meme.sites.cluster[[as.character(j)]] <- msc
+			meme.sites.cluster[[as.character(j)]] <- meme.positions.to.sites(memes, env$genes$upstream.seqs, env$upstream.start)
 		}
 		meme.sites[[as.character(env$cluster.ensemble@k[i])]] <- meme.sites.cluster
 	}

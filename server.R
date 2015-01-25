@@ -215,31 +215,36 @@ shinyServer(
 			)
 			png.path = paste(dir, paste(ns, ".png", sep=""), sep="/")
 			motif.img <- paste("<img src='", png.path, "' alt=''></img>", sep="")
-			ms <- env$meme.sites[[input$k]][[input$cluster]]
+			# get the list of sites
+			msc <- env$meme.sites[[input$k]][[input$cluster]]
 			# go through list and empty out image url for genes with no motif positions
+			# if we need an image, check if it exists or set a flag to render all pngs
 			render.pngs <- F
 			for (n in 1:length(ns)) {
-				if (dim(ms[ms$gene==ns[n], ])[1] == 0) {
+				if (dim(msc[msc$gene==ns[n], ])[1] == 0) {
 					motif.img[n] <- ""
 				} else if (identical(render.pngs, F) && !file.exists(png.path[n])) {
 					render.pngs <- T
 				}
 			}
-			# render the pngs 
-			ms <- motifs()
+			# render the pngs if necessary
 			if (identical(render.pngs, T)) {
+				ms <- motifs()
+				cat(sprintf("rendering %d pngs...", length(ns)))
 				renderMotifPlots(dir,
 					genes = ns,
 					upstream.seqs = env$genes$upstream.seqs[ns,],
 					upstream.start = env$upstream.start,
 					upstream.end = env$upstream.end,
 					motifs = ms,
-					motif.colors = env$motif.colors
+					motif.colors = env$motif.colors,
+					msc = msc
 				)
+				cat("done!\n")
 			}
 			data.frame("Locus tag" = ns, 
 				"Product" = env$genes$annotations[ns, "product"],
-				"Motif Images" = motif.img,
+				"Motif images" = motif.img,
 				check.names = F
 			)
 		}, options = list(paging = F),
@@ -351,7 +356,10 @@ shinyServer(
 		})
 		my.cluster.genes <- reactive({
 			if (!is.null(input$myClusterGenes)) {
-				return(unlist(strsplit(input$myClusterGenes, "\n", fixed=T)))
+				genes <- unlist(strsplit(input$myClusterGenes, "\n", fixed=T))
+				valid.genes <- genes %in% rownames(env$samples$log.ratio)
+				print(genes[valid.genes])
+				return(genes[valid.genes])
 			}
 			return(default.my.cluster.genes)
 		})
@@ -389,7 +397,8 @@ shinyServer(
 
 				# load the meme output file
 				motifs <- memeParse(meme.file, training.set)
-				renderMotifPlots(dir,
+				cat(sprintf("rendering %d pngs...", length(mcg)))
+				meme.sites <- renderMotifPlots(paste(dir, env$dir.motif.plots, sep="/"),
 					genes = mcg,
 					upstream.seqs = env$genes$upstream.seqs[mcg,],
 					upstream.start = env$upstream.start,
@@ -397,6 +406,7 @@ shinyServer(
 					motifs = motifs,
 					motif.colors = env$motif.colors
 				)
+				cat("done!\n")
 				return(list("meme.data" = motifs, "meme.sites" = meme.sites))
 			}
 			return(NULL)
@@ -453,93 +463,93 @@ shinyServer(
 			}
 			data.frame("Locus tag" = ns, 
 				"Product" = env$genes$annotations[ns, "product"],
-				"Motif Images" = motif.img,
+				"Motif images" = motif.img,
 				check.names = F
 			)
 		}, options = list(paging = F))
 		output$myClusterMotif1Summary <- renderText({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 1) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 1) {
 				return(NULL)
 			}
-			paste("E-value:", ms$meme.data[[1]]$e.value, "- genes: ", length(ms$meme.data[[1]]$positions$gene))
+			paste("E-value:", mcm$meme.data[[1]]$e.value, "- genes: ", length(mcm$meme.data[[1]]$positions$gene))
 		})
 		output$myClusterMotif1Consensus <- renderText({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 1) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 1) {
 				return(NULL)
 			}
-			paste("Consesus:", ms$meme.data[[1]]$consensus);
+			paste("Consesus:", mcm$meme.data[[1]]$consensus);
 		})
 		output$myClusterMotif1Plot <- renderPlot({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 1) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 1) {
 				return(NULL)
 			}
-			seqLogo(t(ms$meme.data[[1]]$pssm))
+			seqLogo(t(mcm$meme.data[[1]]$pssm))
 		})
 		output$myClusterMotif2Summary <- renderText({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 2) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 2) {
 				return(NULL)
 			}
-			paste("E-value:", ms$meme.data[[2]]$e.value, "- genes: ", length(ms$meme.data[[2]]$positions$gene))
+			paste("E-value:", mcm$meme.data[[2]]$e.value, "- genes: ", length(mcm$meme.data[[2]]$positions$gene))
 		})
 		output$myClusterMotif2Consensus <- renderText({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 2) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 2) {
 				return(NULL)
 			}
-			paste("Consesus:", ms$meme.data[[2]]$consensus);
+			paste("Consesus:", mcm$meme.data[[2]]$consensus);
 		})
 		output$myClusterMotif2Plot <- renderPlot({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 2) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 2) {
 				return(NULL)
 			}
-			seqLogo(t(ms$meme.data[[2]]$pssm))
+			seqLogo(t(mcm$meme.data[[2]]$pssm))
 		})
 		output$myClusterMotif3Summary <- renderText({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 3) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 3) {
 				return(NULL)
 			}
-			paste("E-value:", ms$meme.data[[3]]$e.value, "- genes: ", length(ms$meme.data[[3]]$positions$gene))
+			paste("E-value:", mcm$meme.data[[3]]$e.value, "- genes: ", length(mcm$meme.data[[3]]$positions$gene))
 		})
 		output$myClusterMotif3Consensus <- renderText({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 3) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 3) {
 				return(NULL)
 			}
-			paste("Consesus:", ms$meme.data[[3]]$consensus);
+			paste("Consesus:", mcm$meme.data[[3]]$consensus);
 		})
 		output$myClusterMotif3Plot <- renderPlot({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 3) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 3) {
 				return(NULL)
 			}
-			seqLogo(t(ms$meme.data[[3]]$pssm))
+			seqLogo(t(mcm$meme.data[[3]]$pssm))
 		})
 		output$myClusterMotif4Summary <- renderText({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 1) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$mem.data) < 4) {
 				return(NULL)
 			}
-			paste("E-value:", ms$meme.data[[4]]$e.value, "- genes: ", length(ms$meme.data[[4]]$positions$gene))
+			paste("E-value:", mcm$meme.data[[4]]$e.value, "- genes: ", length(mcm$meme.data[[4]]$positions$gene))
 		})
 		output$myClusterMotif4Consensus <- renderText({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 1) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 4) {
 				return(NULL)
 			}
-			paste("Consesus:", ms$meme.data[[4]]$consensus);
+			paste("Consesus:", mcm$meme.data[[4]]$consensus);
 		})
 		output$myClusterMotif4Plot <- renderPlot({
-			ms <- my.cluster.motifs()
-			if (is.null(ms) || length(ms) < 1) {
+			mcm <- my.cluster.motifs()
+			if (is.null(mcm) || length(mcm$meme.data) < 4) {
 				return(NULL)
 			}
-			seqLogo(t(ms$meme.data[[4]]$pssm))
+			seqLogo(t(mcm$meme.data[[4]]$pssm))
 		})
 		output$myClusterMemeLog <- renderText({
 			# register reactivity with the gene list text area

@@ -6,6 +6,8 @@ library(grid)
 library(gridExtra)
 library(reshape2)
 
+source("utilities.R")
+
 # data and utilities for plotting cluster profiles
 magenta <- "#FF00FF"
 cyan <- "#00FFFF"
@@ -51,7 +53,7 @@ print(head(profile.data))
 	genesdf <- data.frame(t(profile.data), Sample = names(profile.data))
 	genesdf$Sample <- factor(genesdf$Sample, levels = names(profile.data))
 	mdf <- melt(genesdf, id.vars = c("Sample"))
-	if (length(genes) > 4) {	
+	if (length(genes) > 5) {	
 		cmin<-apply(profile.data, 2, min)
 		cmean<-apply(profile.data, 2, mean)
 		cmax<-apply(profile.data, 2, max)
@@ -190,26 +192,11 @@ makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple 
 			geom_line(aes(x = Sample, y = max, group = 1), colour = grey)
 }
 
-renderMotifPlots <- function(dir, genes, upstream.seqs, upstream.start, upstream.end, motifs, motif.colors) {
+renderMotifPlots <- function(dir, genes, upstream.seqs, upstream.start, upstream.end, motifs, motif.colors, msc = F) {
 	dir.create(dir, recursive = T, showWarnings = F)
-	sites <- list()
-	mi <- 1
-	for (motif in motifs) {
-		# new data frame from position table, fill in motif and width with rep
-		# compute xmin, xmax for easy ggplot viewing
-		uplen <- upstream.seqs[as.character(motif$positions$gene),"uplength"]
-		df <- data.frame(
-			cbind(motif$positions),
-			motif=rep(mi, length(motif$positions$gene)),
-			width=rep(motif$width, length(motif$positions$gene)),
-			xmin = upstream.start - (uplen - motif$positions$start),
-			xmax = upstream.start - (uplen - (motif$positions$start + motif$width))
-		)
-		sites[[as.character(mi)]] <- df
-		mi <- mi + 1
+	if (identical(msc, F)) {
+		msc <- meme.positions.to.sites(motifs, upstream.seqs, upstream.start)
 	}
-	msc <- do.call("rbind", sites)
-	msc$motif <- as.factor(msc$motif)
 	names(motif.colors) <- levels(msc$motif)
 	for (g in levels(msc$gene)) {
 		mscg <- msc[msc$gene == g,]
@@ -238,7 +225,7 @@ renderMotifPlots <- function(dir, genes, upstream.seqs, upstream.start, upstream
 					axis.ticks.margin = unit(0,"null")
 				) +
 				labs(x = NULL, y = NULL) + 
-				xlim(upstream.end, upstream.start) + ylim(0,1)
+				xlim(upstream.end - 1, upstream.start + 1) + ylim(0,1)
 		)
 		dev.off()
 	}

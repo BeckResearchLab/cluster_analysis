@@ -19,3 +19,27 @@ get.distsum <- function() {
 	df = data.frame(k=X, distsum=Y, distsum.delta=Z)
 	return(df);
 }
+
+# take a set of motifs and process those lists into a single data frame
+# with the sites that is easy to plot
+meme.positions.to.sites <- function(motifs, upstream.seqs, upstream.start) {
+	sites <- list()
+	mi <- 1
+	for (motif in motifs) {
+		# new data frame from position table, fill in motif and with with rep
+		# compute xmin, xmax for easy ggplot viewing
+		uplen <- upstream.seqs[as.character(motif$positions$gene),"uplength"]
+		df <- data.frame(
+			cbind(motif$positions),
+			motif = rep(mi, length(motif$positions$gene)),
+			width = rep(motif$width, length(motif$positions$gene)),
+			xmin = upstream.start - (uplen - motif$positions$start),
+			xmax = upstream.start - (uplen - (motif$positions$start + motif$width)) - 1
+		)
+		sites[[as.character(mi)]] <- df
+		mi <- mi + 1
+	}
+	msc <- do.call("rbind", sites)
+	msc$motif <- as.factor(msc$motif)
+	return(msc)
+}
