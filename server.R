@@ -355,12 +355,16 @@ shinyServer(
 			}
 		})
 		my.cluster.genes <- reactive({
+			input$myClusterGenesUpdateButton
+
+			isolate({
 			if (!is.null(input$myClusterGenes)) {
 				genes <- unlist(strsplit(input$myClusterGenes, "\n", fixed=T))
 				valid.genes <- genes %in% rownames(env$samples$log.ratio)
 				return(genes[valid.genes])
 			}
 			return(default.my.cluster.genes)
+			})
 		})
 		my.cluster.motifs <- reactive({
 			mcg <- my.cluster.genes()
@@ -439,10 +443,9 @@ shinyServer(
 		output$myClusterMembers <- renderDataTable({
 			ns <- my.cluster.genes()
 			mcm <- my.cluster.motifs()
-			# hierachical clustering of rows for row ordering
 			# could this be precomputed?
-			clustres <- env$samples$log.ratio[ns,]
 			if (length(ns) > 1) {
+				clustres <- env$samples$log.ratio[ns,]
 				hclustres <- hclust(dist(clustres), method="complete")
 				ns <- ns[hclustres$order]
 			}
@@ -455,10 +458,14 @@ shinyServer(
 					"' alt=''></img>", sep="")
 			# for genes with no sites, empty out the image url
 			ms <- mcm$meme.sites
-			for (n in 1:length(ns)) {
-				if (dim(ms[ms$gene==ns[n],])[1] == 0) {
-					motif.img[n] <- ""
+			if (length(ms)) {
+				for (n in 1:length(ns)) {
+					if (dim(ms[ms$gene==ns[n],])[1] == 0) {
+						motif.img[n] <- ""
+					}
 				}
+			} else {
+				motif.img <- rep("", length(motif.img))
 			}
 			data.frame("Locus tag" = ns, 
 				"Product" = env$genes$annotations[ns, "product"],
@@ -551,11 +558,14 @@ shinyServer(
 			seqLogo(t(mcm$meme.data[[4]]$pssm))
 		})
 		output$myClusterMemeLog <- renderText({
-			# register reactivity with the gene list text area
-			input$myClusterGenes
-			dir <- paste(env$dir.output, "my_cluster.dir", sep="/")
-			meme.file <- paste(dir, "meme.txt", sep="/")
-			paste(readLines(meme.file), "\n")
+			# register reactivity with the gene list text area and update button
+			my.cluster.genes()
+			dir <- paste(env$dir.output, env$dir.my.cluster, sep="/")
+			meme.file <- paste(dir, env$file.meme.txt, sep="/")
+			if (file.exists(meme.file)) {
+				return(paste(readLines(meme.file), "\n"))
+			}
+			return(NULL)
 		})
 
 		# blastn
