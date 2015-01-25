@@ -20,7 +20,11 @@ env$upstream.start <- -1
 env$upstream.end <- -301
 
 # pathes
+env$dir.root <- "/Users/dacb/work/5G/cluster_analysis"
 env$dir.output <- "cluster_analysis.dir"
+env$dir.motif.plots <- "motif_plots.dir"
+env$dir.my.cluster <- "my_cluster.dir"
+env$url.prefix <- "http://127.0.0.1:4202"
 
 # clustering
 env$flexclust.seed <- 8576
