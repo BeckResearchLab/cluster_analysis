@@ -20,14 +20,14 @@ source("env.config.R")
 env.assemble <- function(include.meme = T) {
 	# reconstruct the environment by loading each piece or executing code
 	# if exists load
-	if (file.exists(env$file.env.sample.cache)) {
+	if (file.exists(env$file.env.samples.cache)) {
 		cat("reading samples cache...\n")
-		env$samples <- readRDS(env$file.env.sample.cache)
+		env$samples <- readRDS(env$file.env.samples.cache)
 	} else {
 		# or compute
 		env$samples <- env.samples.setup(env$file.sample.info, env$file.sample.ordering, env$file.sample.tracks, 
 			env$file.rpkm, env$file.counts, env$reference.sample)
-		saveRDS(env$samples, env$file.env.sample.cache);
+		saveRDS(env$samples, env$file.env.samples.cache);
 	}
 	# repeat as above for gene data
 	if (file.exists(env$file.env.genes.cache)) {

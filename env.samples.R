@@ -42,7 +42,7 @@ env.samples.setup <- function(file.sample.info, file.sample.ordering, file.sampl
 	# reorder table mostly for viewing pleasure
 	samples$log.ratio <- samples$log.ratio[, samples$ordering]
 
-	cat("creating MDS and PCA...\n")
+	cat("performing MDS...\n")
 	library(MASS)
 	# create MDS
 	dlr <- dist(samples$log.ratio)
@@ -52,6 +52,7 @@ env.samples.setup <- function(file.sample.info, file.sample.ordering, file.sampl
 	samples$cmds <- cmdscale(dlr, mds.dim)
 	samples$mds <- isoMDS(dlr, samples$cmds, mds.dim)
 	# create PCA
+	cat("performing PCA...\n")
 	samples$prcomp <- prcomp(samples$log.ratio)
 
 	return(samples)
