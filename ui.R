@@ -1,9 +1,9 @@
 library(shiny)
 library(shinyBS)
 
-load("../cluster_analysis.5.RData")
+source("env.R")
 
-motif.colors <- c("#d7191c", "#fdae61", "#abd9e9", "#2c7bb6")
+env.assemble()
 
 shinyUI(
 	navbarPage(
@@ -89,7 +89,7 @@ shinyUI(
 				column(12, h4("Motifs", align="center"),
 					fluidRow(
 						column(width=3,
-							p(tags$b("Motif 1"), style=paste("color:", motif.colors[1], sep=" "), 
+							p(tags$b("Motif 1"), style=paste("color:", env$motif.colors[1], sep=" "), 
 								bsActionButton("clusterMotif1Like", label = bsGlyph("icon-thumbs-up")),
 								bsTooltip("clusterMotif1Like", "Save the workflow that generated this motif", "right"),
 								align="center"
@@ -107,7 +107,7 @@ shinyUI(
 							plotOutput("clusterMotif1Plot", height="180px")
 						),
 						column(width=3,
-							p(tags$b("Motif 2"), style=paste("color:", motif.colors[2], sep=" "),
+							p(tags$b("Motif 2"), style=paste("color:", env$motif.colors[2], sep=" "),
 								bsActionButton("clusterMotif2Like", label = bsGlyph("icon-thumbs-up")),
 								bsTooltip("clusterMotif2Like", "Save the workflow that generated this motif", "right"),
 								align="center"
@@ -123,7 +123,7 @@ shinyUI(
 							plotOutput("clusterMotif2Plot", height="180px")
 						),
 						column(width=3,
-							p(tags$b("Motif 3"), style=paste("color:", motif.colors[3], sep=" "),
+							p(tags$b("Motif 3"), style=paste("color:", env$motif.colors[3], sep=" "),
 								bsActionButton("clusterMotif3Like", label = bsGlyph("icon-thumbs-up")),
 								bsTooltip("clusterMotif3Like", "Save the workflow that generated this motif", "left"),
 								align="center"
@@ -139,7 +139,7 @@ shinyUI(
 							plotOutput("clusterMotif3Plot", height="180px")
 						),
 						column(width=3,
-							p(tags$b("Motif 4"), style=paste("color:", motif.colors[4], sep=" "),
+							p(tags$b("Motif 4"), style=paste("color:", env$motif.colors[4], sep=" "),
 								bsActionButton("clusterMotif4Like", label = bsGlyph("icon-thumbs-up")),
 								bsTooltip("clusterMotif4Like", "Save the workflow that generated this motif", "left"),
 								align="center"
@@ -234,7 +234,7 @@ shinyUI(
 				column(12, h4("Motifs", align="center"),
 					fluidRow(
 						column(width=3,
-							p(tags$b("Motif 1"), style=paste("color:", motif.colors[1], sep=" "),
+							p(tags$b("Motif 1"), style=paste("color:", env$motif.colors[1], sep=" "),
 								bsActionButton("myClusterMotif1Like", label = bsGlyph("icon-thumbs-up")),
 								align="center"
 							),
@@ -246,7 +246,7 @@ shinyUI(
 							plotOutput("myClusterMotif1Plot", height="180px")
 						),
 						column(width=3,
-							p(tags$b("Motif 2"), style=paste("color:", motif.colors[2], sep=" "),
+							p(tags$b("Motif 2"), style=paste("color:", env$motif.colors[2], sep=" "),
 								bsActionButton("myClusterMotif2Like", label = bsGlyph("icon-thumbs-up")),
 								align="center"
 							),
@@ -258,7 +258,7 @@ shinyUI(
 							plotOutput("myClusterMotif2Plot", height="180px")
 						),
 						column(width=3,
-							p(tags$b("Motif 3"), style=paste("color:", motif.colors[3], sep=" "),
+							p(tags$b("Motif 3"), style=paste("color:", env$motif.colors[3], sep=" "),
 								bsActionButton("myClusterMotif3Like", label = bsGlyph("icon-thumbs-up")),
 								align="center"
 							),
@@ -270,7 +270,7 @@ shinyUI(
 							plotOutput("myClusterMotif3Plot", height="180px")
 						),
 						column(width=3,
-							p(tags$b("Motif 4"), style=paste("color:", motif.colors[4], sep=" "),
+							p(tags$b("Motif 4"), style=paste("color:", env$motif.colors[4], sep=" "),
 								bsActionButton("myClusterMotif4Like", label = bsGlyph("icon-thumbs-up")),
 								align="center"
 							),
