@@ -47,13 +47,15 @@ cluster.size.plot <- function(kclust) {
 		theme_bw()
 }
 
-makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple = F, focus = F, display.motif.gene.profile = F, motifs = F, motif.colors = F) {
+makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple = F, focus = F, 
+			display.motif.gene.profile = F, motifs = F, motif.colors = F, 
+			display.tracks = F, tracks = F) {
 		pd.min <- min(profile.data)
 		pd.max <- max(profile.data)
 		cmin<-apply(profile.data, 2, min)
 		cmean<-apply(profile.data, 2, mean)
 		cmax<-apply(profile.data, 2, max)
-		if (!simple) {
+		if (identical(simple, F)) {
 			if (dim(profile.data)[1] > 4) {
 				# estimate CDF from data
 				cis <- apply(profile.data, 2, kCDF)
@@ -134,6 +136,29 @@ makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple 
 			geom_line(aes(x = Sample, y = mean, group = 1), colour = cyan) + 
 			geom_line(aes(x = Sample, y = min, group = 1), colour = grey) + 
 			geom_line(aes(x = Sample, y = max, group = 1), colour = grey)
+
+		# for each track in display.tracks plot the track above the profile
+		if (identical(simple, F) && !identical(display.tracks, F) && length(display.tracks) > 0
+				&& !identical(tracks, F) && length(tracks) > 0) {
+			track.data <- data.frame(cbind(tracks[env$samples$ordering, display.tracks]), row.names=env$samples$ordering)
+			names(track.data) <- display.tracks
+			track.data$Sample <- factor(rownames(track.data), levels = rownames(track.data))
+			print(head(track.data))
+			trackplot <- ggplot(track.data, aes(x = Sample))
+			for (y in display.tracks) {
+				trackplot <- trackplot + geom_bar(stat = "identity", aes_string(y = y))
+			}
+			trackplot <- trackplot +
+				theme_bw() +
+				theme(axis.title.x = element_blank(), axis.ticks = element_blank(), axis.text.x = element_blank())
+			ggplot_gtable(ggplot_build(trackplot))
+			ggplot_gtable(ggplot_build(myplot))
+			max.width = unit.pmax(trackplot$widths[2:3], myplot$widths[2:3])
+			trackplot$widths[2:3] <- max.width
+			myplot$widths[2:3] <- max.width
+			return(grid.arrange(trackplot, myplot, heights=c(1,4)))
+		}
+		return(myplot)
 }
 
 renderMotifPlots <- function(dir, genes, upstream.seqs, upstream.start, upstream.end, motifs, motif.colors, msc = F) {

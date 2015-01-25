@@ -43,3 +43,25 @@ meme.positions.to.sites <- function(motifs, upstream.seqs, upstream.start) {
 	msc$motif <- as.factor(msc$motif)
 	return(msc)
 }
+
+test.cluster.profile.plot <- function() {
+	input <- list()
+	input$k <- 10
+	input$cluster <- 10
+	clusts <- clusters(env$cluster.ensemble[[input$k]])
+	clust <- clusts[clusts==input$cluster]
+	rowFocus <- F
+	cl <- clust
+	profile.data <- env$samples$log.ratio[names(cl),]
+	head(profile.data)
+	makeClusterProfilePlot(profile.data = profile.data,
+		title = sprintf("K = %d : Cluster %d (%d genes)\nExpression profile",
+			env$cluster.ensemble[[input$k]]@k, as.integer(input$cluster), length(names(cl))
+		),
+		focus = rowFocus,
+		display.motif.gene.profile = F,
+		motifs = env$meme.data[[input$k]][[input$cluster]],
+		display.tracks = c("FAME"),
+		tracks = env$samples$tracks
+	)
+}

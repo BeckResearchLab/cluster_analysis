@@ -107,7 +107,7 @@ shinyServer(
 				],
 				motifs = env$meme.data[[input$k]][[input$cluster]],
 				display.tracks = c("FAME"),
-				tracks = env$tracks
+				tracks = env$samples$tracks
 			)
 		})
 		motifs <- reactive({
