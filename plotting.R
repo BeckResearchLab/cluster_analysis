@@ -48,6 +48,8 @@ cluster.size.plot <- function(kclust) {
 }
 
 makeMyClusterProfilePlot <- function(profile.data, genes, display.motif.gene.profile = F, motifs = F, motif.colors = F) {
+	browser()
+
 	profile.data <- profile.data[genes,]
 print(head(profile.data))
 	genesdf <- data.frame(t(profile.data), Sample = names(profile.data))
@@ -110,7 +112,7 @@ makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple 
 		cmean<-apply(profile.data, 2, mean)
 		cmax<-apply(profile.data, 2, max)
 		if (!simple) {
-			if (dim(profile.data)[1] > 3) {
+			if (dim(profile.data)[1] > 4) {
 				# estimate CDF from data
 				cis <- apply(profile.data, 2, kCDF)
 				# get min at 95% CI
