@@ -46,7 +46,10 @@ shinyServer(
 		output$clusterOverviewPlot <- renderPlot({
 			plot(kclust(), project=env$prcomp)
 		})
-		output$clusterProfileOverviewPlotArea <- renderPlot ({
+		output$clusterProfileOverviewPlotArea <- renderUI ({
+			plotOutput("clusterProfileOverviewPlot", height=paste((as.numeric(input$k)/3.) * 200.,"px", sep=""))
+		})
+		output$clusterProfileOverviewPlot <- renderPlot({
 			profilePlots <- lapply(1:input$k,
 				function(cluster) {
 					clust <- clusts()[clusts() == cluster]

@@ -50,7 +50,7 @@ shinyUI(
 			),
 			fluidRow(
 				h4("Cluster profile overview", align="center"),
-				plotOutput("clusterProfileOverviewPlotArea", height="1600px"),
+				uiOutput("clusterProfileOverviewPlotArea"),
 				bsTooltip("clusterProfileOverviewPlotArea", "Expression profile for genes in each cluster", "top")
 			)
 		),

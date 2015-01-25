@@ -47,64 +47,6 @@ cluster.size.plot <- function(kclust) {
 		theme_bw()
 }
 
-makeMyClusterProfilePlot <- function(profile.data, genes, display.motif.gene.profile = F, motifs = F, motif.colors = F) {
-	browser()
-
-	profile.data <- profile.data[genes,]
-print(head(profile.data))
-	genesdf <- data.frame(t(profile.data), Sample = names(profile.data))
-	genesdf$Sample <- factor(genesdf$Sample, levels = names(profile.data))
-	mdf <- melt(genesdf, id.vars = c("Sample"))
-	if (length(genes) > 4) {	
-		cmin<-apply(profile.data, 2, min)
-		cmean<-apply(profile.data, 2, mean)
-		cmax<-apply(profile.data, 2, max)
-		# estimate CDF from data
-		cis <- apply(profile.data, 2, kCDF)
-		# get min at 95% CI
-		lwr <- sapply(cis, cdf2cimin)
-		# get max at 95% CI
-		upr <- sapply(cis, cdf2cimax)
-		# cluster data frame
-		clustdf <- data.frame(min = cmin, max = cmax, mean = cmean, lwr=lwr, upr=upr, Sample = names(cmean))
-		clustdf$Sample <- factor(clustdf$Sample, levels = names(cmean))
-		myplot <- ggplot(clustdf, aes(x = Sample)) + 
-			geom_ribbon(
-				aes(ymax=upr, ymin=lwr, group = 1, alpha=0.7), 
-				colour = magenta
-			)
-	} else {
-		myplot <- ggplot(mdf, aes(x = Sample, y = value, group = variable))
-	}
-	myplot <- myplot +
-			geom_point(data = mdf, 
-				aes(x = Sample, y = value, group = variable), color = yellow
-			) +
-			geom_line(data = mdf, 
-				aes(x = Sample, y = value, group = variable), color = yellow
-			) +
-			ggtitle("Expression profile") +
-			ylab("Log2(Sample / T0)\nNormalized counts") +
-			theme_bw() +
-			theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none")
-
-	# the profile list must not be F an the length of the 
-	if (!identical(display.motif.gene.profile, F) && length(display.motif.gene.profile) > 0 
-				&& !identical(motifs, F) && length(motifs) > 0 
-				&& !identical(motif.colors, F) && length(motif.colors) > 0) {
-			for (m in 1:length(display.motif.gene.profile)) {
-				motif <- motifs[[display.motif.gene.profile[m]]]
-				motifdf <- data.frame(t(profile.data[as.character(motif$positions$gene),]), Sample = names(profile.data))
-				motifdf$Sample <- factor(genesdf$Sample, levels = names(profile.data))
-				mdf <- melt(motifdf, id.vars = c("Sample"))
-				myplot <- myplot + 
-					geom_point(data = mdf, aes(x = Sample, y = value, group = variable), color = motif.colors[display.motif.gene.profile[m]]) +
-					geom_line(data = mdf, aes(x = Sample, y = value, group = variable), color = motif.colors[display.motif.gene.profile[m]])
-			}
-	}
-	return(myplot)
-}
-
 makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple = F, focus = F, display.motif.gene.profile = F, motifs = F, motif.colors = F) {
 		pd.min <- min(profile.data)
 		pd.max <- max(profile.data)
