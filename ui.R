@@ -195,6 +195,10 @@ shinyUI(
 						),
 						uiOutput("myClusterGenesUI"),
 						bsTooltip("myClusterGenesUI", "Enter a list of locus tags to include in the cluster, one per line", "right")
+					),
+					column(2, offset=3,
+						actionButton("myClusterGenesUpdateButton", "Update..."),
+						bsTooltip("myClusterGenesUpdateButton", "Submit the gene list for analyses")
 					)
 				),
 				column(6, offset=1,
@@ -214,8 +218,9 @@ shinyUI(
 									bsTooltip("myClusterRecruitBy", "Select the method that should be used to recruit new genes to this cluster", "left")
 								)
 							),
-							column(2, offset=5,
-								actionButton("myClusterRecruitButton", "Recruit...")
+							column(2, offset=4,
+								actionButton("myClusterRecruitButton", "Recruit..."),
+								bsTooltip("myClusterRecruitButton", "Search for additional transcripts")
 							)
 						)
 					)

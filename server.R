@@ -358,7 +358,6 @@ shinyServer(
 			if (!is.null(input$myClusterGenes)) {
 				genes <- unlist(strsplit(input$myClusterGenes, "\n", fixed=T))
 				valid.genes <- genes %in% rownames(env$samples$log.ratio)
-				print(genes[valid.genes])
 				return(genes[valid.genes])
 			}
 			return(default.my.cluster.genes)
@@ -412,7 +411,7 @@ shinyServer(
 			return(NULL)
 		})
 		output$myClusterGenesUI <- renderUI({
-			tags$textarea(id="myClusterGenes", rows=8, cols=32, paste(my.cluster.genes(), collapse="\n"), style="display: block; margin-left: auto; margin-right: auto;")
+			tags$textarea(id="myClusterGenes", rows=6, cols=32, paste(my.cluster.genes(), collapse="\n"), style="display: block; margin-left: auto; margin-right: auto;")
 		})
 		output$myClusterProfilePlot <- renderPlot({
 			if (is.null(input$myClusterSelectedRows)) {
