@@ -45,7 +45,7 @@ shinyUI(
 				h4("Clustering overview", align="center"),
 				p(align="center",
 					plotOutput("clusterOverviewPlot", width="600px", height="600px"),
-					bsTooltip("clusterOverviewPlot", "Identify clusters by color after projecting genes onto 2D non-metric multidimensional scaling", "right")
+					bsTooltip("clusterOverviewPlot", "Identify clusters by color after projecting genes first two components of PCA", "right")
 				)
 			),
 			fluidRow(

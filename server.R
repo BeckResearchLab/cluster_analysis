@@ -44,7 +44,7 @@ shinyServer(
 			cluster.size.plot(kclust())
 		})
 		output$clusterOverviewPlot <- renderPlot({
-			plot(kclust(), project=env$prcomp)
+			plot(kclust(), project=env$samples$prcomp)
 		})
 		output$clusterProfileOverviewPlotArea <- renderUI ({
 			plotOutput("clusterProfileOverviewPlot", height=paste((as.numeric(input$k)/3.) * 200.,"px", sep=""))
@@ -54,7 +54,7 @@ shinyServer(
 				function(cluster) {
 					clust <- clusts()[clusts() == cluster]
 					profile.data <- env$samples$log.ratio[names(clust),]
-					makeClusterProfilePlot(profile.data, 
+					makeClusterProfilePlot(profile.data = profile.data, 
 						title = cluster,
 						y.range.adj = 1.5,
 						simple = T
@@ -92,7 +92,7 @@ shinyServer(
 				return(NULL)
 			}
 			profile.data <- env$samples$log.ratio[names(cl),]
-			makeClusterProfilePlot(profile.data,
+			makeClusterProfilePlot(profile.data = profile.data,
 				title = sprintf("K = %d : Cluster %d (%d genes)\nExpression profile",
 					env$cluster.ensemble[[input$k]]@k, as.integer(input$cluster), length(names(cl))
 				),
@@ -105,7 +105,9 @@ shinyServer(
 						input$displayMotif4GeneProfile
 					)
 				],
-				motifs <- env$meme.data[[input$k]][[input$cluster]]
+				motifs = env$meme.data[[input$k]][[input$cluster]],
+				display.tracks = c("FAME"),
+				tracks = env$tracks
 			)
 		})
 		motifs <- reactive({
