@@ -82,7 +82,10 @@ makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple 
 			}
 			myplot <- myplot +
 				theme_bw() +
-				theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none")
+				theme(axis.text.x = element_text(angle = 90, hjust = 1), 
+					legend.position = "none",
+					plot.margin = unit(c(0,0.5,0,0), "lines")
+				)
 		} else {
 			clustdf <- data.frame(min = cmin, max = cmax, mean = cmean, Sample = names(cmean))
 			clustdf$Sample <- factor(clustdf$Sample, levels = names(cmean))
@@ -131,7 +134,7 @@ makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple 
 		}
 
 		# show min, mean and max
-		myplot +
+		myplot <- myplot +
 			geom_point(aes(y = mean), colour = cyan) + 
 			geom_line(aes(x = Sample, y = mean, group = 1), colour = cyan) + 
 			geom_line(aes(x = Sample, y = min, group = 1), colour = grey) + 
@@ -140,22 +143,33 @@ makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple 
 		# for each track in display.tracks plot the track above the profile
 		if (identical(simple, F) && !identical(display.tracks, F) && length(display.tracks) > 0
 				&& !identical(tracks, F) && length(tracks) > 0) {
+
+			print((length(tracks[,1])))
+			print((length(env$samples$ordering)))
+			print((length(tracks[env$samples$ordering, display.tracks])))
+			print(tracks[env$samples$ordering, display.tracks])
+			print(length(env$samples$ordering))
+
 			track.data <- data.frame(cbind(tracks[env$samples$ordering, display.tracks]), row.names=env$samples$ordering)
 			names(track.data) <- display.tracks
 			track.data$Sample <- factor(rownames(track.data), levels = rownames(track.data))
-			print(head(track.data))
+			#print(head(track.data))
 			trackplot <- ggplot(track.data, aes(x = Sample))
 			for (y in display.tracks) {
 				trackplot <- trackplot + geom_bar(stat = "identity", aes_string(y = y))
 			}
 			trackplot <- trackplot +
 				theme_bw() +
-				theme(axis.title.x = element_blank(), axis.ticks = element_blank(), axis.text.x = element_blank())
+				theme(axis.title.x = element_blank(), 
+					axis.ticks = element_blank(), 
+					axis.text.x = element_blank(),
+					plot.margin = unit(c(0,0.5,0,0.05), "lines")
+				)
 			ggplot_gtable(ggplot_build(trackplot))
 			ggplot_gtable(ggplot_build(myplot))
-			max.width = unit.pmax(trackplot$widths[2:3], myplot$widths[2:3])
-			trackplot$widths[2:3] <- max.width
-			myplot$widths[2:3] <- max.width
+			#max.width = unit.pmax(trackplot$widths[2:3], myplot$widths[2:3])
+			#trackplot$widths[2:3] <- max.width
+			#myplot$widths[2:3] <- max.width
 			return(grid.arrange(trackplot, myplot, heights=c(1,4)))
 		}
 		return(myplot)
