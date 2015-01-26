@@ -143,13 +143,6 @@ makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple 
 		# for each track in display.tracks plot the track above the profile
 		if (identical(simple, F) && !identical(display.tracks, F) && length(display.tracks) > 0
 				&& !identical(tracks, F) && length(tracks) > 0) {
-
-			print((length(tracks[,1])))
-			print((length(env$samples$ordering)))
-			print((length(tracks[env$samples$ordering, display.tracks])))
-			print(tracks[env$samples$ordering, display.tracks])
-			print(length(env$samples$ordering))
-
 			track.data <- data.frame(cbind(tracks[env$samples$ordering, display.tracks]), row.names=env$samples$ordering)
 			names(track.data) <- display.tracks
 			track.data$Sample <- factor(rownames(track.data), levels = rownames(track.data))
@@ -170,7 +163,7 @@ makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple 
 			#max.width = unit.pmax(trackplot$widths[2:3], myplot$widths[2:3])
 			#trackplot$widths[2:3] <- max.width
 			#myplot$widths[2:3] <- max.width
-			return(grid.arrange(trackplot, myplot, heights=c(1,4)))
+			return(grid.arrange(trackplot, myplot, heights=c(1,5)))
 		}
 		return(myplot)
 }
