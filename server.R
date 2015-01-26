@@ -106,6 +106,7 @@ shinyServer(
 					)
 				],
 				motifs = env$meme.data[[input$k]][[input$cluster]],
+				motif.colors = env$motif.colors,
 				display.tracks = c("FAME"),
 				tracks = env$samples$tracks
 			)
