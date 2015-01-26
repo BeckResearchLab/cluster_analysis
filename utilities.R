@@ -53,14 +53,14 @@ test.cluster.profile.plot <- function() {
 	rowFocus <- F
 	cl <- clust
 	profile.data <- env$samples$log.ratio[names(cl),]
-	head(profile.data)
 	makeClusterProfilePlot(profile.data = profile.data,
 		title = sprintf("K = %d : Cluster %d (%d genes)\nExpression profile",
 			env$cluster.ensemble[[input$k]]@k, as.integer(input$cluster), length(names(cl))
 		),
 		focus = rowFocus,
-		display.motif.gene.profile = F,
+		display.motif.gene.profile = c(1),
 		motifs = env$meme.data[[input$k]][[input$cluster]],
+		motif.colors = env$motif.colors,
 		display.tracks = c("FAME"),
 		tracks = env$samples$tracks
 	)
