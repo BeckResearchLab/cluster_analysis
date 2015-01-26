@@ -80,7 +80,7 @@ shinyUI(
 					fluidRow(
 						column(12,
 							plotOutput("clusterProfilePlot"),
-							bsTooltip("clusterProfilePlot", "Depicts the expression profile for genes in cluster.  The band indicates a 95% CI", "top")
+							bsTooltip("clusterProfilePlot", "Depicts any tracks you have displayed and the expression profile for genes in cluster.  The band indicates a 95% CI", "top")
 						)
 					)
 				)
