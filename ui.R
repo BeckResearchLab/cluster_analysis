@@ -35,8 +35,6 @@ shinyUI(
 				)
 			),
 			fluidRow(
-			),
-			fluidRow(
 				h4("Cluster sizes", align="center"),
 				plotOutput("clusterSizePlot"),
 				bsTooltip("clusterSizePlot", "Shows the number of genes in each cluster generated for this k", "top")
@@ -75,6 +73,13 @@ shinyUI(
 				column(12, h4("Cluster ", textOutput("cluster", container = span), 
 						bsActionButton("clusterLike", label = bsGlyph("icon-thumbs-up")),
 						bsTooltip("clusterLike", "Save the workflow that got you to this cluster", "top"),
+						({
+							tracks <- c()
+							for (t in names(env$samples$tracks)) {
+								tracks <- c(tracks, t)
+							}
+							radioButtons("clusterProfilePlotTracks", "", tracks, inline = T)
+						}),
 						align="center"
 					),
 					fluidRow(
