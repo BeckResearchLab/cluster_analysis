@@ -49,7 +49,7 @@ cluster.size.plot <- function(kclust) {
 
 makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple = F, focus = F, 
 			display.motif.gene.profile = F, motifs = F, motif.colors = F, 
-			display.tracks = F, tracks = F) {
+			display.tracks = F, tracks = F, alt.sample.names = F) {
 		pd.min <- min(profile.data)
 		pd.max <- max(profile.data)
 		cmin<-apply(profile.data, 2, min)
@@ -86,6 +86,9 @@ makeClusterProfilePlot <- function(profile.data, title, y.range.adj = 0, simple 
 					legend.position = "none",
 					plot.margin = unit(c(0,0.5,0,0), "lines")
 				)
+			if (!identical(alt.sample.names, F)) {
+				myplot <- myplot + scale_x_discrete(labels=alt.sample.names)
+			}
 		} else {
 			clustdf <- data.frame(min = cmin, max = cmax, mean = cmean, Sample = names(cmean))
 			clustdf$Sample <- factor(clustdf$Sample, levels = names(cmean))

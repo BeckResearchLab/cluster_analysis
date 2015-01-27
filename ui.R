@@ -73,21 +73,23 @@ shinyUI(
 				column(12, h4("Cluster ", textOutput("cluster", container = span), 
 						bsActionButton("clusterLike", label = bsGlyph("icon-thumbs-up")),
 						bsTooltip("clusterLike", "Save the workflow that got you to this cluster", "top"),
-						({
-							tracks <- c()
-							for (t in names(env$samples$tracks)) {
-								tracks <- c(tracks, t)
-							}
-							radioButtons("clusterProfilePlotTracks", "", tracks, inline = T)
-						}),
-						align="center"
-					),
-					fluidRow(
-						column(12,
-							plotOutput("clusterProfilePlot"),
-							bsTooltip("clusterProfilePlot", "Depicts any tracks you have displayed and the expression profile for genes in cluster.  The band indicates a 95% CI", "top")
-						)
+						radioButtons("clusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
+						bsTooltip("clusterProfilePlotTracks", "Which sample tracks should be displayed above the profile plot", "top"),
+						radioButtons("clusterProfilePlotSampleNames", "",
+								c("Short sample names" = "Short",
+									"Full names" = "Full",
+									"Sample ID" = "ID"), 
+								inline = T
+						),
+						bsTooltip("clusterProfilePlotSampleNames", "Should samples be labeled by a short name, full name or ID", "top"),
+						align = "center"
 					)
+				)
+			),
+			fluidRow(
+				column(12,
+					plotOutput("clusterProfilePlot"),
+					bsTooltip("clusterProfilePlot", "Depicts any tracks you have displayed and the expression profile for genes in cluster.  The band indicates a 95% CI", "top")
 				)
 			),
 			fluidRow(

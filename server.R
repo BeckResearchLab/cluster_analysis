@@ -92,6 +92,13 @@ shinyServer(
 				return(NULL)
 			}
 			profile.data <- env$samples$log.ratio[names(cl),]
+			if (input$clusterProfilePlotSampleNames == "Full") {
+				sample.names <- env$samples$info[env$samples$ordering, "fancy.names"]
+			} else if (input$clusterProfilePlotSampleNames == "Short") {
+				sample.names <- env$samples$info[env$samples$ordering, "shortd"]
+			} else {
+				sample.names <- F
+			}
 			makeClusterProfilePlot(profile.data = profile.data,
 				title = sprintf("K = %d : Cluster %d (%d genes)\nExpression profile",
 					env$cluster.ensemble[[input$k]]@k, as.integer(input$cluster), length(names(cl))
@@ -108,7 +115,8 @@ shinyServer(
 				motifs = env$meme.data[[input$k]][[input$cluster]],
 				motif.colors = env$motif.colors,
 				display.tracks = input$clusterProfilePlotTracks,
-				tracks = env$samples$tracks
+				tracks = env$samples$tracks,
+				alt.sample.names = sample.names
 			)
 		})
 		motifs <- reactive({

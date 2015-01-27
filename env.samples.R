@@ -41,6 +41,8 @@ env.samples.setup <- function(file.sample.info, file.sample.ordering, file.sampl
 	samples$ordering <- rownames(samples$ordering)[rownames(samples$ordering) %in% names(samples$log.ratio)]
 	# reorder table mostly for viewing pleasure
 	samples$log.ratio <- samples$log.ratio[, samples$ordering]
+	# derive fancy names for samples
+	samples$info$fancy.names <- paste(samples$info$shortd, " (", rownames(samples$info), ")", sep="")
 
 	cat("performing MDS...\n")
 	library(MASS)
