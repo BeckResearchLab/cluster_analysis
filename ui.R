@@ -237,6 +237,23 @@ shinyUI(
 				column(12, hr())
 			),
 			fluidRow(
+				column(12, h4("My cluster", 
+						bsActionButton("myClusterLike", label = bsGlyph("icon-thumbs-up")),
+						bsTooltip("myClusterLike", "Save the workflow that got you to this cluster", "top"),
+						radioButtons("myClusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
+						bsTooltip("myClusterProfilePlotTracks", "Which sample tracks should be displayed above the profile plot", "top"),
+						radioButtons("myClusterProfilePlotSampleNames", "",
+								c("Short sample names" = "Short",
+									"Full names" = "Full",
+									"Sample ID" = "ID"), 
+								inline = T
+						),
+						bsTooltip("myClusterProfilePlotSampleNames", "Should samples be labeled by a short name, full name or ID", "top"),
+						align = "center"
+					)
+				)
+			),
+			fluidRow(
 				column(12,
 					plotOutput("myClusterProfilePlot"),
 					bsTooltip("myClusterProfilePlot", "Expression profile for genes in this cluster", "top")

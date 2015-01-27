@@ -438,6 +438,13 @@ shinyServer(
 				rowFocus <- input$myClusterSelectedRows
 			}
 			profile.data <- env$samples$log.ratio[my.cluster.genes(),]
+			if (input$myClusterProfilePlotSampleNames == "Full") {
+				sample.names <- env$samples$info[env$samples$ordering, "fancy.names"]
+			} else if (input$myClusterProfilePlotSampleNames == "Short") {
+				sample.names <- env$samples$info[env$samples$ordering, "shortd"]
+			} else {
+				sample.names <- F
+			}
 			makeClusterProfilePlot(profile.data = profile.data,
 				title = "",
 				y.range.adj = 1.5,
@@ -451,7 +458,10 @@ shinyServer(
 					)
 				],
 				motifs = my.cluster.motifs()$meme.data,
-				motif.colors = env$motif.colors
+				motif.colors = env$motif.colors,
+				display.tracks = input$myClusterProfilePlotTracks,
+				tracks = env$samples$tracks,
+				alt.sample.names = sample.names
 			)
 		})
 		output$myClusterMembers <- renderDataTable({
