@@ -1,7 +1,41 @@
 library(shiny)
 library(shinyBS)
 
-myModal <- function(id, title, trigger, ..., href) {
+myModal <- function (id, title, trigger, ..., href) {
+	mo <- tags$div(class = "modal sbs-modal fade", id = id, 
+		'data-trigger' = trigger, tabindex="-1", role="dialog", 
+		'aria-labelledby'=sprintf("%sLabel", id), 'aria-hidden'="true",
+		tags$div(class = "modal-dialog", 
+			tags$div(class = "modal-content", 
+				tags$div(class = "modal-header", 
+					tags$button(type = "button", class = "close", 'data-dismiss' = "modal", HTML("&times;")), 
+					tags$h3(class = "modal-title", id=sprintf("%sLabel", id), title)
+				), 
+				body <- tags$div(class = "modal-body"),
+				tags$div(class = "modal-footer", 
+					tags$button(type = "button", 
+						class = "btn btn-warning",
+						"data-dismiss" = "modal", "Cancel"),
+					tags$button(type = "button", 
+						id = paste(id, "Close", sep=""), 
+						class = "btn btn-success sbs-action-button",
+						"data-dismiss" = "modal", "Like")
+				) 
+			)
+		)
+	)
+
+	if (!missing(href)) {
+		mo <- addAttribs(mo, 'data-remote' = href)
+	} else {
+		mo$children[[1]]$children[[1]]$children[[2]] <- tagAppendChildren(mo$children[[1]]$children[[1]]$children[[2]],
+			list = list(...)
+		)
+	}
+	return(mo)
+}
+
+oldMyModal <- function(id, title, trigger, ..., href) {
 	mo <- tags$div(class = "modal sbs-modal hide fade", id = id,
 		"data-trigger" = trigger,
 		tags$div(class = "modal-header",
