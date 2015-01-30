@@ -21,12 +21,18 @@ next.session.id <- 0
 
 shinyServer(
 	function(input, output, session) {
+		# these help us create a unique session id for tracking
 		session.id <- next.session.id
 		next.session.id <<- next.session.id + 1
+		# this function checks for an existing conection and returns it
+		# or else it makes a new connection (also handles timeout)
 		db.con <- getConnection(env$mysql.database)
 
+		# session log observe handler
 		observe({
+			# convert the input to a singel line data.frame
 			input.state <- data.frame(lapply(input, function(x) t(data.frame(x))))
+			# add some session id info, combine all three for a unique session
 			input.state$instance.pid <- c( instance.pid )
 			input.state$instance.time <- c( instance.time )
 			input.state$session.id <- c( session.id )
@@ -43,9 +49,11 @@ shinyServer(
 				input.state$clusterSearchResultSelectedRow <- c(NA)
 			}
 			if (is.null(input.state$myClusterGenes)) {
+				# "" sets the type to text
 				input.state$myClusterGenes <- ""
 			}
 
+			# if the table exists, append, else create new and either way save
 			if (dbExistsTable(db.con, env$mysql.log.table)) {
 				dbWriteTable(db.con, env$mysql.log.table, input.state, append = T)
 			} else {
