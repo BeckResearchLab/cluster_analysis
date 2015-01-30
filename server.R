@@ -24,6 +24,7 @@ shinyServer(
 		# these help us create a unique session id for tracking
 		session.id <- next.session.id
 		next.session.id <<- next.session.id + 1
+		session.counter <- 0
 		# this function checks for an existing conection and returns it
 		# or else it makes a new connection (also handles timeout)
 		db.con <- getConnection(env$mysql.database)
@@ -36,6 +37,8 @@ shinyServer(
 			input.state$instance.pid <- c( instance.pid )
 			input.state$instance.time <- c( instance.time )
 			input.state$session.id <- c( session.id )
+			input.state$session.counter <- c ( session.counter )
+			session.counter <<- session.counter + 1
 
 			# handle dynamic ui inputs
 			if (is.null(input.state$cluster)) {
