@@ -32,6 +32,9 @@ shinyServer(
 		# session log observe handler
 		observe({
 			# convert the input to a singel line data.frame
+			# 1st, convert lists
+			input.tmp <- input
+			input.tmp$clusterSelectedRows
 			input.state <- data.frame(lapply(input, function(x) t(data.frame(x))))
 			# add some session id info, combine all three for a unique session
 			input.state$instance.pid <- c( instance.pid )
@@ -54,6 +57,9 @@ shinyServer(
 			if (is.null(input.state$myClusterGenes)) {
 				# "" sets the type to text
 				input.state$myClusterGenes <- ""
+			}
+			if (is.null(input.state$myClusterSelectedRows)) {
+				input.state$myClusterSelectedRows <- c(NA)
 			}
 
 			# if the table exists, append, else create new and either way save
@@ -490,6 +496,7 @@ shinyServer(
 				title = "",
 				y.range.adj = 1.5,
 				simple = F,
+				focus = rowFocus,
 				display.motif.gene.profile = c(1:4)[
 					c(
 					input$displayMyMotif1GeneProfile,
@@ -537,7 +544,22 @@ shinyServer(
 				"Motif images" = motif.img,
 				check.names = F
 			)
-		}, options = list(paging = F))
+		}, options = list(paging = F),
+			callback = "function(table) {
+      				table.on('click.dt', 'tr', function() {
+        				$(this).toggleClass('selected');
+						var seldata = table.rows('.selected').indexes().toArray();
+						var data = table.rows('.selected').data().data();
+						var genes = [];
+						for (sel in seldata) {
+							genes.push(data[seldata[sel]][0])
+						}
+						console.log(genes);
+        				Shiny.onInputChange('myClusterSelectedRows', genes);
+					});
+				}"
+		)
+
 		output$myClusterMotif1Summary <- renderText({
 			mcm <- my.cluster.motifs()
 			if (is.null(mcm) || length(mcm$meme.data) < 1) {
