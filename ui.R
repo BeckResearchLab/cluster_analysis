@@ -311,9 +311,6 @@ shinyUI(
 			),
 			fluidRow(
 				column(12,
-					p(tags$br(), tags$b("NOTE: "), "rows in this table are not selectable", align="center")
-				),
-				column(12,
 					dataTableOutput('myClusterMembers'),
 					bsTooltip("myClusterMembers", "Searchable, orderable table of genes in this cluster", "top")
 				)
