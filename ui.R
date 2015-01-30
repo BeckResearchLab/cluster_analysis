@@ -1,6 +1,45 @@
 library(shiny)
 library(shinyBS)
 
+myModal <- function(id, title, trigger, ..., href) {
+	mo <- tags$div(class = "modal sbs-modal hide fade", id = id,
+		"data-trigger" = trigger,
+		tags$div(class = "modal-header",
+		tags$button(type = "button", class = "close",
+			"data-dismiss" = "modal", HTML("&times;")),
+		tags$h3(title)),
+		body <- tags$div(class = "modal-body"),
+		tags$div(class = "modal-footer",
+			tags$button(type = "button", 
+				id = paste(id, "Close", sep=""), 
+				class = "btn sbs-action-button",
+				"data-dismiss" = "modal", "Close")
+#			tags$a(href = "#", id = paste(id, "Close", sep=""), 
+#				class = "btn sbs-action-button", "data-dismiss" = "modal", "Close")
+		)
+	)
+	if(!missing(href)) {
+		mo <- addAttribs(mo, "data-remote" = href)
+	} else {
+		mo$children[[2]] <- tagAppendChildren(mo$children[[2]], list = list(...))
+	}
+	return(mo) 
+}
+
+myLikeModal <- function(tall, short) {
+	myModal(
+		id = sprintf("like%sReasonModal", tall),
+		title = sprintf("Like %s reason", short),
+		trigger = "",
+		tags$p(HTML(sprintf("Why did you like this %s?", short)),
+			tags$div(class = "row-fluid",
+				textInput(sprintf("like%sReason", tall), "Leave blank to cancel", ""),
+				tags$head(tags$style(type="text/css", sprintf("#like%sReason {width: 510px}", tall)))
+			)
+		)
+	)
+}
+
 shinyUI(
 	navbarPage(
 		title = env$study.title,
@@ -24,10 +63,11 @@ shinyUI(
 			fluidRow(
 				column(12,
 					h3("Results from clustering with k = ", textOutput("k", container = span), 
-						bsActionButton("kLike", label = bsGlyph("icon-thumbs-up")),
-						bsTooltip("kLike", "Save the workflow that got you to this k", "right"),
+						bsActionButton("kLikeButton", label = bsGlyph("icon-thumbs-up")),
+						bsTooltip("kLikeButton", "Save the workflow that got you to this k", "right"),
 						align="center"
-					)
+					),
+					myLikeModal("K", "k")
 				)
 			),
 			fluidRow(
@@ -67,8 +107,9 @@ shinyUI(
 			),
 			fluidRow(
 				column(12, h4("Cluster ", textOutput("cluster", container = span), 
-						bsActionButton("clusterLike", label = bsGlyph("icon-thumbs-up")),
-						bsTooltip("clusterLike", "Save the workflow that got you to this cluster", "top"),
+						bsActionButton("clusterLikeButton", label = bsGlyph("icon-thumbs-up")),
+						bsTooltip("clusterLikeButton", "Save the workflow that got you to this cluster", "top"),
+						myLikeModal("Cluster", "cluster"),
 						radioButtons("clusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
 						bsTooltip("clusterProfilePlotTracks", "Which sample tracks should be displayed above the profile plot", "top"),
 						radioButtons("clusterProfilePlotSampleNames", "",
@@ -93,8 +134,8 @@ shinyUI(
 					fluidRow(
 						column(width=3,
 							p(tags$b("Motif 1"), style=paste("color:", env$motif.colors[1], sep=" "), 
-								bsActionButton("clusterMotif1Like", label = bsGlyph("icon-thumbs-up")),
-								bsTooltip("clusterMotif1Like", "Save the workflow that generated this motif", "right"),
+								bsActionButton("clusterMotif1LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsTooltip("clusterMotif1LikeButton", "Save the workflow that generated this motif", "right"),
 								align="center"
 							),
 							p(textOutput("clusterMotif1Summary", container = span), 
@@ -111,8 +152,8 @@ shinyUI(
 						),
 						column(width=3,
 							p(tags$b("Motif 2"), style=paste("color:", env$motif.colors[2], sep=" "),
-								bsActionButton("clusterMotif2Like", label = bsGlyph("icon-thumbs-up")),
-								bsTooltip("clusterMotif2Like", "Save the workflow that generated this motif", "right"),
+								bsActionButton("clusterMotif2LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsTooltip("clusterMotif2LikeButton", "Save the workflow that generated this motif", "right"),
 								align="center"
 							),
 							p(textOutput("clusterMotif2Summary", container = span), align="center"),
@@ -127,8 +168,8 @@ shinyUI(
 						),
 						column(width=3,
 							p(tags$b("Motif 3"), style=paste("color:", env$motif.colors[3], sep=" "),
-								bsActionButton("clusterMotif3Like", label = bsGlyph("icon-thumbs-up")),
-								bsTooltip("clusterMotif3Like", "Save the workflow that generated this motif", "left"),
+								bsActionButton("clusterMotif3LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsTooltip("clusterMotif3LikeButton", "Save the workflow that generated this motif", "left"),
 								align="center"
 							),
 							p(textOutput("clusterMotif3Summary", container = span), align="center"),
@@ -143,8 +184,8 @@ shinyUI(
 						),
 						column(width=3,
 							p(tags$b("Motif 4"), style=paste("color:", env$motif.colors[4], sep=" "),
-								bsActionButton("clusterMotif4Like", label = bsGlyph("icon-thumbs-up")),
-								bsTooltip("clusterMotif4Like", "Save the workflow that generated this motif", "left"),
+								bsActionButton("clusterMotif4LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsTooltip("clusterMotif4LikeButton", "Save the workflow that generated this motif", "left"),
 								align="center"
 							),
 							p(textOutput("clusterMotif4Summary", container = span), align="center"),
@@ -192,8 +233,6 @@ shinyUI(
 				column(3, offset=1,
 					column(12, 
 						h4("Enter CDS locus tags:", 
-							bsActionButton("myClusterGenesLike", label = bsGlyph("icon-thumbs-up")),
-							bsTooltip("myClusterGenesLike", "Save the workflow that generated this cluster", "top"),
 							align="center"
 						),
 						uiOutput("myClusterGenesUI"),
@@ -234,8 +273,9 @@ shinyUI(
 			),
 			fluidRow(
 				column(12, h4("My cluster", 
-						bsActionButton("myClusterLike", label = bsGlyph("icon-thumbs-up")),
-						bsTooltip("myClusterLike", "Save the workflow that got you to this cluster", "top"),
+						bsActionButton("myClusterLikeButton", label = bsGlyph("icon-thumbs-up")),
+						bsTooltip("myClusterLikeButton", "Save the workflow that got you to this cluster", "top"),
+						myLikeModal("MyCluster", "cluster"),
 						radioButtons("myClusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
 						bsTooltip("myClusterProfilePlotTracks", "Which sample tracks should be displayed above the profile plot", "top"),
 						radioButtons("myClusterProfilePlotSampleNames", "",
@@ -260,7 +300,7 @@ shinyUI(
 					fluidRow(
 						column(width=3,
 							p(tags$b("Motif 1"), style=paste("color:", env$motif.colors[1], sep=" "),
-								bsActionButton("myClusterMotif1Like", label = bsGlyph("icon-thumbs-up")),
+								bsActionButton("myClusterMotif1LikeButton", label = bsGlyph("icon-thumbs-up")),
 								align="center"
 							),
 							p(textOutput("myClusterMotif1Summary", container = span), align="center"),
@@ -272,7 +312,7 @@ shinyUI(
 						),
 						column(width=3,
 							p(tags$b("Motif 2"), style=paste("color:", env$motif.colors[2], sep=" "),
-								bsActionButton("myClusterMotif2Like", label = bsGlyph("icon-thumbs-up")),
+								bsActionButton("myClusterMotif2LikeButton", label = bsGlyph("icon-thumbs-up")),
 								align="center"
 							),
 							p(textOutput("myClusterMotif2Summary", container = span), align="center"),
@@ -284,7 +324,7 @@ shinyUI(
 						),
 						column(width=3,
 							p(tags$b("Motif 3"), style=paste("color:", env$motif.colors[3], sep=" "),
-								bsActionButton("myClusterMotif3Like", label = bsGlyph("icon-thumbs-up")),
+								bsActionButton("myClusterMotif3LikeButton", label = bsGlyph("icon-thumbs-up")),
 								align="center"
 							),
 							p(textOutput("myClusterMotif3Summary", container = span), align="center"),
@@ -296,7 +336,7 @@ shinyUI(
 						),
 						column(width=3,
 							p(tags$b("Motif 4"), style=paste("color:", env$motif.colors[4], sep=" "),
-								bsActionButton("myClusterMotif4Like", label = bsGlyph("icon-thumbs-up")),
+								bsActionButton("myClusterMotif4LikeButton", label = bsGlyph("icon-thumbs-up")),
 								align="center"
 							),
 							p(textOutput("myClusterMotif4Summary", container = span), align="center"),

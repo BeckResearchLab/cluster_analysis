@@ -60,12 +60,14 @@ shinyServer(
 				transform(input.state, cluster <- as.integer(input.state$cluster))
 			}
 			if (is.null(input.state$clusterSearchResultSelectedRow)) {
+				# "" sets the type to text
 				input.state$clusterSearchResultSelectedRow <- ""
 			}
 			if (is.null(input.state$myClusterGenes)) {
 				# "" sets the type to text
 				input.state$myClusterGenes <- ""
 			}
+			input.state$myClusterGenes <- as.character(input.state$myClusterGenes)
 
 			# if the table exists, append, else create new and either way save
 			if (dbExistsTable(db.con, env$mysql.log.table)) {
@@ -117,6 +119,17 @@ shinyServer(
 		})
 
 		# choose cluster tab
+		observe({
+			if (input$kLikeButton != 0) {
+				toggleModal(session, "likeKModal")
+			}
+			if (input$clusterLikeButton != 0) {
+				toggleModal(session, "likeClusterReasonModal")
+			}
+			if (input$myClusterLikeButton != 0) {
+				toggleModal(session, "likeMyClusterReasonModal")
+			}
+		})
 		clusts <- reactive({
 			clusters(env$cluster.ensemble[[input$k]])
 		})
