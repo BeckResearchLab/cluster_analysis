@@ -31,9 +31,10 @@ shinyServer(
 
 		# session log observe handler
 		observe({
-			# convert the input to a singel line data.frame
+			# convert the input to a single line data.frame and patch
+			# 0. copy the reactive object
 			input.tmp <- as.list(input)
-			# 1st, flatten lists
+			# 1. flatten lists
 			if (is.null(input.tmp$clusterSelectedRows)) {
 				input.tmp$clusterSelectedRows <- ""
 			} else {
@@ -44,21 +45,22 @@ shinyServer(
 			} else {
 				input.tmp$myClusterSelectedRows <- paste(input.tmp$myClusterSelectedRows, collapse=",")
 			}
+			# 2. make data frame
 			input.state <- data.frame(lapply(input.tmp, function(x) t(data.frame(x))))
+			# 3. add session specific data for tracing
 			# add some session id info, combine all three for a unique session
 			input.state$instance.pid <- c( instance.pid )
 			input.state$instance.time <- c( instance.time )
 			input.state$session.id <- c( session.id )
 			input.state$session.counter <- c ( session.counter )
 			session.counter <<- session.counter + 1
-
-			# handle dynamic ui inputs
+			# 4. handle dynamic ui inputs
 			if (is.null(input.state$cluster)) {
 				input.state$cluster <- c(NA)
 				transform(input.state, cluster <- as.integer(input.state$cluster))
 			}
 			if (is.null(input.state$clusterSearchResultSelectedRow)) {
-				input.state$clusterSearchResultSelectedRow <- c(NA)
+				input.state$clusterSearchResultSelectedRow <- ""
 			}
 			if (is.null(input.state$myClusterGenes)) {
 				# "" sets the type to text

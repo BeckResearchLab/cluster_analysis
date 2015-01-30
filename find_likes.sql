@@ -17,5 +17,6 @@ SELECT * ,
 	FROM log
 	ORDER BY `instance.time`, `instance.pid`, `session.id`, `session.counter`
 
-) AS ordered_log WHERE ordered_log.liked = 1
+) AS ordered_log 
+	WHERE ordered_log.liked = 1
 ;
