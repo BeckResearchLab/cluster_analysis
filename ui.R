@@ -11,9 +11,12 @@ myModal <- function(id, title, trigger, ..., href) {
 		body <- tags$div(class = "modal-body"),
 		tags$div(class = "modal-footer",
 			tags$button(type = "button", 
+				class = "btn btn-warning",
+				"data-dismiss" = "modal", "Cancel"),
+			tags$button(type = "button", 
 				id = paste(id, "Close", sep=""), 
-				class = "btn sbs-action-button",
-				"data-dismiss" = "modal", "Close")
+				class = "btn btn-success sbs-action-button",
+				"data-dismiss" = "modal", "Like")
 #			tags$a(href = "#", id = paste(id, "Close", sep=""), 
 #				class = "btn sbs-action-button", "data-dismiss" = "modal", "Close")
 		)
@@ -33,7 +36,7 @@ myLikeModal <- function(tall, short) {
 		trigger = "",
 		tags$p(HTML(sprintf("Why did you like this %s?", short)),
 			tags$div(class = "row-fluid",
-				textInput(sprintf("like%sReason", tall), "Leave blank to cancel", ""),
+				textInput(sprintf("like%sReason", tall), "", ""),
 				tags$head(tags$style(type="text/css", sprintf("#like%sReason {width: 510px}", tall)))
 			)
 		)
