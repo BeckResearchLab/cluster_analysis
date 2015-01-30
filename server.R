@@ -32,10 +32,19 @@ shinyServer(
 		# session log observe handler
 		observe({
 			# convert the input to a singel line data.frame
-			# 1st, convert lists
-			input.tmp <- input
-			input.tmp$clusterSelectedRows
-			input.state <- data.frame(lapply(input, function(x) t(data.frame(x))))
+			input.tmp <- as.list(input)
+			# 1st, flatten lists
+			if (is.null(input.tmp$clusterSelectedRows)) {
+				input.tmp$clusterSelectedRows <- ""
+			} else {
+				input.tmp$clusterSelectedRows <- paste(input.tmp$clusterSelectedRows, collapse=",")
+			}
+			if (is.null(input.tmp$myClusterSelectedRows)) {
+				input.tmp$myClusterSelectedRows <- ""
+			} else {
+				input.tmp$myClusterSelectedRows <- paste(input.tmp$myClusterSelectedRows, collapse=",")
+			}
+			input.state <- data.frame(lapply(input.tmp, function(x) t(data.frame(x))))
 			# add some session id info, combine all three for a unique session
 			input.state$instance.pid <- c( instance.pid )
 			input.state$instance.time <- c( instance.time )
@@ -48,18 +57,12 @@ shinyServer(
 				input.state$cluster <- c(NA)
 				transform(input.state, cluster <- as.integer(input.state$cluster))
 			}
-			if (is.null(input.state$clusterSelectedRows)) {
-				input.state$clusterSelectedRows <- c(NA)
-			}
 			if (is.null(input.state$clusterSearchResultSelectedRow)) {
 				input.state$clusterSearchResultSelectedRow <- c(NA)
 			}
 			if (is.null(input.state$myClusterGenes)) {
 				# "" sets the type to text
 				input.state$myClusterGenes <- ""
-			}
-			if (is.null(input.state$myClusterSelectedRows)) {
-				input.state$myClusterSelectedRows <- c(NA)
 			}
 
 			# if the table exists, append, else create new and either way save
