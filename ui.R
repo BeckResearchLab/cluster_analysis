@@ -1,10 +1,6 @@
 library(shiny)
 library(shinyBS)
 
-source("env.R")
-
-env.assemble()
-
 shinyUI(
 	navbarPage(
 		title = env$study.title,

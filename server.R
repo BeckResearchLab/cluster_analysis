@@ -27,7 +27,7 @@ shinyServer(
 		session.counter <- 0
 		# this function checks for an existing conection and returns it
 		# or else it makes a new connection (also handles timeout)
-		db.con <- getConnection(env$mysql.database)
+		db.con <- get.connection(env$mysql.database)
 
 		# session log observe handler
 		observe({
@@ -431,7 +431,7 @@ shinyServer(
 
 			if (length(training.set$length) > 1) {
 				clust.seqs.upstream <- env$genes$upstream.seqs[mcg,]
-				dir <- paste(env$dir.output, env$dir.my.cluster, sep="/")
+				dir <- dir.my.cluster(env$dir.output, env$dir.my.cluster, instance.pid, instance.time, session.id)
                 dir.create(dir, recursive = T, showWarnings = F)
                 fasta.file <- paste(dir, env$file.upstream.fa, sep="/")
                 if (file.exists(fasta.file)) {
@@ -516,7 +516,7 @@ shinyServer(
 			}
 
 			# put together path of the motif image for each gene
-			dir <- paste(env$dir.output, env$dir.my.cluster, env$dir.motif.plots, sep="/")
+			dir <- paste(dir.my.cluster(env$dir.output, env$dir.my.cluster, instance.pid, instance.time, session.id), env$dir.motif.plots, sep="/")
 			# use runif to append a random number to prevent all caching here
 			motif.img <- paste("<img src='", 
 					paste(env$url.prefix, dir, paste(ns, ".png?", runif(1, min=0, max=10), sep=""), sep="/"),
@@ -625,7 +625,7 @@ shinyServer(
 		output$myClusterMemeLog <- renderText({
 			# register reactivity with the gene list text area and update button
 			my.cluster.genes()
-			dir <- paste(env$dir.output, env$dir.my.cluster, sep="/")
+			dir <- dir.my.cluster(env$dir.output, env$dir.my.cluster, instance.pid, instance.time, session.id)
 			meme.file <- paste(dir, env$file.meme.txt, sep="/")
 			if (file.exists(meme.file)) {
 				return(paste(readLines(meme.file), "\n"))
