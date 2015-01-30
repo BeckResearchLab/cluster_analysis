@@ -7,14 +7,7 @@ library(gridExtra)
 library(reshape2)
 library(seqLogo)
 library(pdist)
-
-options(error = recover)
-
-source("env.R")
-source("utilities.R")
-source("plotting.R")
-
-env.assemble()
+library(RMySQL)
 
 addResourcePath("cluster_analysis.dir", sprintf("%s/%s", env$dir.root, env$dir.output))
 
@@ -22,8 +15,45 @@ addResourcePath("cluster_analysis.dir", sprintf("%s/%s", env$dir.root, env$dir.o
 # but these 3 make for a nice demo
 default.my.cluster.genes <- c("MBURv2_160308", "MBURv2_160304", "MBURv2_160312")
 
+instance.pid <- Sys.getpid()
+instance.time <- as.integer(Sys.time())
+next.session.id <- 0
+
 shinyServer(
 	function(input, output, session) {
+		session.id <- next.session.id
+		next.session.id <<- next.session.id + 1
+		db.con <- getConnection(env$mysql.database)
+
+		observe({
+			input.state <- data.frame(lapply(input, function(x) t(data.frame(x))))
+			input.state$instance.pid <- c( instance.pid )
+			input.state$instance.time <- c( instance.time )
+			input.state$session.id <- c( session.id )
+
+			# handle dynamic ui inputs
+			if (is.null(input.state$cluster)) {
+				input.state$cluster <- c(NA)
+				transform(input.state, cluster <- as.integer(input.state$cluster))
+			}
+			if (is.null(input.state$clusterSelectedRows)) {
+				input.state$clusterSelectedRows <- c(NA)
+			}
+			if (is.null(input.state$clusterSearchResultSelectedRow)) {
+				input.state$clusterSearchResultSelectedRow <- c(NA)
+			}
+			if (is.null(input.state$myClusterGenes)) {
+				input.state$myClusterGenes <- ""
+			}
+
+			if (dbExistsTable(db.con, env$mysql.log.table)) {
+				dbWriteTable(db.con, env$mysql.log.table, input.state, append = T)
+			} else {
+				dbWriteTable(db.con, env$mysql.log.table, input.state)
+			}
+
+		})
+
 		# all k tab
 		kdsdf <- get.distsum()
 		output$kDistSumPlot <- renderPlot({
@@ -360,7 +390,7 @@ shinyServer(
 							warning(paste("unhandled input$myClusterRecruitBy case:", input$myClusterRecruitBy))
 						}
 					)
-					# send a client side message about the update to the textarea which will cascade the whole tab
+					# send a client side message about the update to the textarea 
 					message <- list(
 						value=paste(paste(my.cluster.genes(), collapse="\n"), paste(new.genes, collapse="\n"), sep="\n")
 					)
@@ -562,7 +592,7 @@ shinyServer(
 		})
 		output$myClusterMotif4Summary <- renderText({
 			mcm <- my.cluster.motifs()
-			if (is.null(mcm) || length(mcm$mem.data) < 4) {
+			if (is.null(mcm) || length(mcm$meme.data) < 4) {
 				return(NULL)
 			}
 			paste("E-value:", mcm$meme.data[[4]]$e.value, "- genes: ", length(mcm$meme.data[[4]]$positions$gene))

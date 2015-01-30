@@ -53,3 +53,6 @@ env$file.env.meme.sites.cache <- "env.meme.sites.cache.RData"
 # varia, for plotting, etc.
 env$motif.colors <- c("#d7191c", "#fdae61", "#abd9e9", "#2c7bb6")
 
+# database stuff
+env$mysql.database <- "cluster_analysis"
+env$mysql.log.table <- "log"
