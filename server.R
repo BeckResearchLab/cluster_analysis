@@ -413,7 +413,6 @@ shinyServer(
 								new.genes <- rownames(other.log.ratio[order(other.log.ratio$dist),])[1:input$myClusterRecruitN]
 							},
 						min2member = {
-								print("m2m")
 								pdm <- as.matrix(pdist(other.log.ratio, my.cluster.log.ratio))
 								# find the minimum for each row (gene to each member)
 								rmin <- t(sapply(seq(nrow(pdm)), function(i) {
