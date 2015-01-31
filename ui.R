@@ -22,6 +22,17 @@ myModal <- function (id, title, trigger, ..., href) {
 						"data-dismiss" = "modal", "Like")
 				) 
 			)
+		),
+		tags$script(paste("$('#", id, "').on('hidden.bs.modal', function (e) {
+  				$(this)
+    				.find('input,textarea,select')
+       					.val('')
+       					.end()
+    				.find('input[type=checkbox], input[type=radio]')
+       					.prop('checked', '')
+       				.end();
+				})",
+			sep = "")
 		)
 	)
 
@@ -54,7 +65,8 @@ columnMotif <- function(width, offset = 0, n, id_prefix="cluster") {
 		fluidRow(
 			tags$b(sprintf("Motif %d", n)), style=paste("color:", env$motif.colors[n], sep=" "),
 			bsButton(size = "sm", sprintf("%sMotif%dLikeButton", id_prefix, n), label = icon("thumbs-o-up")),
-			bsTooltip(sprintf("%sMotif%dLikeButton", id_prefix, n), "Save the workflow that generated this motif", "left")
+			bsTooltip(sprintf("%sMotif%dLikeButton", id_prefix, n), "Save the workflow that generated this motif", "left"),
+			myLikeModal(sprintf("%sMotif%d", id_prefix, n), "motif")
 		),
 		fluidRow(textOutput(sprintf("%sMotif%dSummary", id_prefix, n), container = span), align = "center"),
 		fluidRow(
@@ -76,12 +88,16 @@ shinyUI(
 		title = env$study.title,
 		theme = "bootstrap.css",
 
-		tabPanel("All k", fluidPage(fluidRow(column(12,
-			plotOutput("kDistSumPlot"),
-			bsTooltip("kDistSumPlot", "Sum across all clusters of the distance to cluster centroids", "top"),
-			plotOutput("kDistSumDeltaPlot"),
-			bsTooltip("kDistSumDeltaPlot", "Difference between sum for a k - the sum for next lower k", "top")
-		)))),
+		tabPanel("All k", fluidPage(
+			fluidRow(
+				column(12,
+					plotOutput("kDistSumPlot"),
+					bsTooltip("kDistSumPlot", "Sum across all clusters of the distance to cluster centroids", "top"),
+					plotOutput("kDistSumDeltaPlot"),
+					bsTooltip("kDistSumDeltaPlot", "Difference between sum for a k - the sum for next lower k", "top")
+				)
+			)
+		)),
 
 		tabPanel("Choose k", fluidPage(
 			# K overview panes
@@ -274,10 +290,10 @@ shinyUI(
 						bsButton(size = "sm", "myClusterLikeButton", label = icon("thumbs-o-up")),
 						bsTooltip("myClusterLikeButton", "Save the workflow that got you to this cluster", "top"),
 						align = "center"
-					)
+					),
+					myLikeModal("myCluster", "recruited cluster")
 				)
 			),
-			myLikeModal("myCluster", "recruited cluster"),
 			fluidRow(
 				column(6,
 					radioButtons("myClusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),

@@ -45,6 +45,10 @@ shinyServer(
 			input$clusterProfilePlotSampleNames
 			input$clusterSelectedRows
 			input$clusterLikeReasonModalClose
+			input$clusterMotif1LikeReasonModalClose
+			input$clusterMotif2LikeReasonModalClose
+			input$clusterMotif3LikeReasonModalClose
+			input$clusterMotif4LikeReasonModalClose
 
 			input$searchText
 
@@ -58,6 +62,10 @@ shinyServer(
 			input$myClusterProfilePlotSampleNames
 			input$myClusterSelectedRows
 			input$myClusterLikeReasonModalClose
+			input$myClusterMotif1LikeReasonModalClose
+			input$myClusterMotif2LikeReasonModalClose
+			input$myClusterMotif3LikeReasonModalClose
+			input$myClusterMotif4LikeReasonModalClose
 
 			input$blastnDatabase		
 
@@ -123,6 +131,11 @@ shinyServer(
 		})
 
 		# choose k tab
+		observe({
+			if (input$kLikeButton != 0) {
+				toggleModal(session, "kLikeReasonModal")
+			}
+		})
 		kclust <- reactive({
 			env$cluster.ensemble[[input$k]]
 		})
@@ -155,14 +168,8 @@ shinyServer(
 
 		# choose cluster tab
 		observe({
-			if (input$kLikeButton != 0) {
-				toggleModal(session, "kLikeReasonModal")
-			}
 			if (input$clusterLikeButton != 0) {
 				toggleModal(session, "clusterLikeReasonModal")
-			}
-			if (input$myClusterLikeButton != 0) {
-				toggleModal(session, "myClusterLikeReasonModal")
 			}
 		})
 		clusts <- reactive({
@@ -471,6 +478,11 @@ shinyServer(
 					)
 					session$sendInputMessage("myClusterGenes", message)
 				})
+			}
+		})
+		observe({
+			if (input$myClusterLikeButton != 0) {
+				toggleModal(session, "myClusterLikeReasonModal")
 			}
 		})
 		my.cluster.genes <- reactive({
