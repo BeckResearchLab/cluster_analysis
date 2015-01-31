@@ -100,7 +100,7 @@ shinyUI(
 			fluidRow(
 				column(12,
 					h3("Results from clustering with k = ", textOutput("k", container = span), 
-						bsActionButton("kLikeButton", label = bsGlyph("icon-thumbs-up")),
+						bsButton("kLikeButton", label = icon("thumbs-o-up")),
 						bsTooltip("kLikeButton", "Save the workflow that got you to this k", "right"),
 						align="center"
 					),
@@ -144,7 +144,7 @@ shinyUI(
 			),
 			fluidRow(
 				column(12, h4("Cluster ", textOutput("cluster", container = span), 
-						bsActionButton("clusterLikeButton", label = bsGlyph("icon-thumbs-up")),
+						bsButton("clusterLikeButton", label = icon("thumbs-o-up")),
 						bsTooltip("clusterLikeButton", "Save the workflow that got you to this cluster", "top"),
 						myLikeModal("Cluster", "cluster"),
 						radioButtons("clusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
@@ -169,9 +169,9 @@ shinyUI(
 			fluidRow(
 				column(12, h4("Motifs", align="center"),
 					fluidRow(
-						column(width=3,
+						column(width = 3,
 							p(tags$b("Motif 1"), style=paste("color:", env$motif.colors[1], sep=" "), 
-								bsActionButton("clusterMotif1LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsButton("clusterMotif1LikeButton", label = icon("thumbs-o-up")),
 								bsTooltip("clusterMotif1LikeButton", "Save the workflow that generated this motif", "right"),
 								align="center"
 							),
@@ -182,14 +182,14 @@ shinyUI(
 								bsTooltip("clusterMotif1Consensus", "Top level of multilevel consensus", "right"),
 								align="center"
 							),
-							column(width=6, offset=3,
+							column(width=9, offset=3,
 								checkboxInput("displayMotif1GeneProfile", "Display profile", value=F)
 							),
 							plotOutput("clusterMotif1Plot", height="180px")
 						),
-						column(width=3,
+						column(width = 3,
 							p(tags$b("Motif 2"), style=paste("color:", env$motif.colors[2], sep=" "),
-								bsActionButton("clusterMotif2LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsButton("clusterMotif2LikeButton", label = icon("thumbs-o-up")),
 								bsTooltip("clusterMotif2LikeButton", "Save the workflow that generated this motif", "right"),
 								align="center"
 							),
@@ -198,14 +198,14 @@ shinyUI(
 								bsTooltip("clusterMotif2Consensus", "Top level of multilevel consensus", "right"),
 								align="center"
 							),
-							column(width=6, offset=3,
+							column(width = 9, offset = 3,
 								checkboxInput("displayMotif2GeneProfile", "Display profile", value=F)
 							),
 							plotOutput("clusterMotif2Plot", height="180px")
 						),
-						column(width=3,
+						column(width = 3,
 							p(tags$b("Motif 3"), style=paste("color:", env$motif.colors[3], sep=" "),
-								bsActionButton("clusterMotif3LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsButton("clusterMotif3LikeButton", label = icon("thumbs-o-up")),
 								bsTooltip("clusterMotif3LikeButton", "Save the workflow that generated this motif", "left"),
 								align="center"
 							),
@@ -214,14 +214,14 @@ shinyUI(
 								bsTooltip("clusterMotif3Consensus", "Top level of multilevel consensus", "left"),
 								align="center"
 							),
-							column(width=6, offset=3,
+							column(width = 9, offset = 3,
 								checkboxInput("displayMotif3GeneProfile", "Display profile", value=F)
 							),
 							plotOutput("clusterMotif3Plot", height="180px")
 						),
-						column(width=3,
+						column(width = 3,
 							p(tags$b("Motif 4"), style=paste("color:", env$motif.colors[4], sep=" "),
-								bsActionButton("clusterMotif4LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsButton("clusterMotif4LikeButton", label = icon("thumbs-o-up")),
 								bsTooltip("clusterMotif4LikeButton", "Save the workflow that generated this motif", "left"),
 								align="center"
 							),
@@ -230,7 +230,7 @@ shinyUI(
 								bsTooltip("clusterMotif4Consensus", "Top level of multilevel consensus", "left"),
 								align="center"
 							),
-							column(width=6, offset=3,
+							column(width = 9, offset = 3,
 								checkboxInput("displayMotif4GeneProfile", "Display profile", value=F)
 							),
 							plotOutput("clusterMotif4Plot", height="180px")
@@ -310,7 +310,7 @@ shinyUI(
 			),
 			fluidRow(
 				column(12, h4("My cluster", 
-						bsActionButton("myClusterLikeButton", label = bsGlyph("icon-thumbs-up")),
+						bsButton("myClusterLikeButton", label = icon("thumbs-o-up")),
 						bsTooltip("myClusterLikeButton", "Save the workflow that got you to this cluster", "top"),
 						myLikeModal("MyCluster", "cluster"),
 						radioButtons("myClusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
@@ -335,50 +335,50 @@ shinyUI(
 			fluidRow(
 				column(12, h4("Motifs", align="center"),
 					fluidRow(
-						column(width=3,
+						column(width = 3,
 							p(tags$b("Motif 1"), style=paste("color:", env$motif.colors[1], sep=" "),
-								bsActionButton("myClusterMotif1LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsButton("myClusterMotif1LikeButton", label = icon("thumbs-o-up")),
 								align="center"
 							),
 							p(textOutput("myClusterMotif1Summary", container = span), align="center"),
 							p(textOutput("myClusterMotif1Consensus", container = span), align="center"),
-							column(width=6, offset=3,
+							column(width = 9, offset = 3,
 								checkboxInput("displayMyMotif1GeneProfile", "Display profile", value=F)
 							),
 							plotOutput("myClusterMotif1Plot", height="180px")
 						),
-						column(width=3,
+						column(width = 3,
 							p(tags$b("Motif 2"), style=paste("color:", env$motif.colors[2], sep=" "),
-								bsActionButton("myClusterMotif2LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsButton("myClusterMotif2LikeButton", label = icon("thumbs-o-up")),
 								align="center"
 							),
 							p(textOutput("myClusterMotif2Summary", container = span), align="center"),
 							p(textOutput("myClusterMotif2Consensus", container = span), align="center"),
-							column(width=6, offset=3,
+							column(width = 9, offset = 3,
 								checkboxInput("displayMyMotif2GeneProfile", "Display profile", value=F)
 							),
 							plotOutput("myClusterMotif2Plot", height="180px")
 						),
-						column(width=3,
+						column(width = 3,
 							p(tags$b("Motif 3"), style=paste("color:", env$motif.colors[3], sep=" "),
-								bsActionButton("myClusterMotif3LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsButton("myClusterMotif3LikeButton", label = icon("thumbs-o-up")),
 								align="center"
 							),
 							p(textOutput("myClusterMotif3Summary", container = span), align="center"),
 							p(textOutput("myClusterMotif3Consensus", container = span), align="center"),
-							column(width=6, offset=3,
+							column(width = 9, offset = 3,
 								checkboxInput("displayMyMotif3GeneProfile", "Display profile", value=F)
 							),
 							plotOutput("myClusterMotif3Plot", height="180px")
 						),
-						column(width=3,
+						column(width = 3,
 							p(tags$b("Motif 4"), style=paste("color:", env$motif.colors[4], sep=" "),
-								bsActionButton("myClusterMotif4LikeButton", label = bsGlyph("icon-thumbs-up")),
+								bsButton("myClusterMotif4LikeButton", label = icon("thumbs-o-up")),
 								align="center"
 							),
 							p(textOutput("myClusterMotif4Summary", container = span), align="center"),
 							p(textOutput("myClusterMotif4Consensus", container = span), align="center"),
-							column(width=6, offset=3,
+							column(width = 9, offset = 3,
 								checkboxInput("displayMyMotif4GeneProfile", "Display profile", value=F)
 							),
 							plotOutput("myClusterMotif4Plot", height="180px")
