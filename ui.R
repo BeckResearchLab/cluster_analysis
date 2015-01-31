@@ -14,11 +14,11 @@ myModal <- function (id, title, trigger, ..., href) {
 				body <- tags$div(class = "modal-body"),
 				tags$div(class = "modal-footer", 
 					tags$button(type = "button", 
-						class = "btn btn-warning",
+						class = "btn btn-warning btn-small",
 						"data-dismiss" = "modal", "Cancel"),
 					tags$button(type = "button", 
 						id = paste(id, "Close", sep=""), 
-						class = "btn btn-success sbs-action-button",
+						class = "btn btn-success sbs-action-button btn-small",
 						"data-dismiss" = "modal", "Like")
 				) 
 			)
@@ -33,34 +33,6 @@ myModal <- function (id, title, trigger, ..., href) {
 		)
 	}
 	return(mo)
-}
-
-oldMyModal <- function(id, title, trigger, ..., href) {
-	mo <- tags$div(class = "modal sbs-modal hide fade", id = id,
-		"data-trigger" = trigger,
-		tags$div(class = "modal-header",
-		tags$button(type = "button", class = "close",
-			"data-dismiss" = "modal", HTML("&times;")),
-		tags$h3(title)),
-		body <- tags$div(class = "modal-body"),
-		tags$div(class = "modal-footer",
-			tags$button(type = "button", 
-				class = "btn btn-warning",
-				"data-dismiss" = "modal", "Cancel"),
-			tags$button(type = "button", 
-				id = paste(id, "Close", sep=""), 
-				class = "btn btn-success sbs-action-button",
-				"data-dismiss" = "modal", "Like")
-#			tags$a(href = "#", id = paste(id, "Close", sep=""), 
-#				class = "btn sbs-action-button", "data-dismiss" = "modal", "Close")
-		)
-	)
-	if(!missing(href)) {
-		mo <- addAttribs(mo, "data-remote" = href)
-	} else {
-		mo$children[[2]] <- tagAppendChildren(mo$children[[2]], list = list(...))
-	}
-	return(mo) 
 }
 
 myLikeModal <- function(tall, short) {
@@ -80,15 +52,16 @@ myLikeModal <- function(tall, short) {
 shinyUI(
 	navbarPage(
 		title = env$study.title,
+		theme = "bootstrap.css",
 
-		tabPanel("All k",
+		tabPanel("All k", fluidPage(fluidRow(column(12,
 			plotOutput("kDistSumPlot"),
 			bsTooltip("kDistSumPlot", "Sum across all clusters of the distance to cluster centroids", "top"),
 			plotOutput("kDistSumDeltaPlot"),
 			bsTooltip("kDistSumDeltaPlot", "Difference between sum for a k - the sum for next lower k", "top")
-		),
+		)))),
 
-		tabPanel("Choose k",
+		tabPanel("Choose k", fluidPage(
 			# K overview panes
 			fluidRow(
 				column(2, offset=5,
@@ -124,16 +97,16 @@ shinyUI(
 				uiOutput("clusterProfileOverviewPlotArea"),
 				bsTooltip("clusterProfileOverviewPlotArea", "Expression profile for genes in each cluster", "top")
 			)
-		),
+		)),
 
-		tabPanel("Choose cluster",
+		tabPanel("Choose cluster", fluidPage(
 			# for K, specific cluster view panes
 			fluidRow(
-				column(2, offset=3,
+				column(3, offset=3,
 					uiOutput("clusterSelection"),
 					bsTooltip("clusterSelection", "Select a cluster index to display", "left")
 				),
-				column(2, 
+				column(3, 
 					p("Spreadsheet"),
 					downloadButton('downloadClusterData', 'Download'),
 					bsTooltip("downloadClusterData", "Download a spreadsheet for genes in cluster", "right")
@@ -143,21 +116,27 @@ shinyUI(
 				column(12, hr())
 			),
 			fluidRow(
-				column(12, h4("Cluster ", textOutput("cluster", container = span), 
+				column(12, 
+					h4("Cluster ", textOutput("cluster", container = span), 
 						bsButton("clusterLikeButton", label = icon("thumbs-o-up")),
 						bsTooltip("clusterLikeButton", "Save the workflow that got you to this cluster", "top"),
-						myLikeModal("Cluster", "cluster"),
-						radioButtons("clusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
-						bsTooltip("clusterProfilePlotTracks", "Which sample tracks should be displayed above the profile plot", "top"),
-						radioButtons("clusterProfilePlotSampleNames", "",
-								c("Short sample names" = "Short",
-									"Full names" = "Full",
-									"Sample ID" = "ID"), 
-								inline = T
-						),
-						bsTooltip("clusterProfilePlotSampleNames", "Should samples be labeled by a short name, full name or ID", "top"),
 						align = "center"
-					)
+					),
+					myLikeModal("Cluster", "cluster")
+				)
+			),
+			fluidRow(
+				column(6, offset = 3,
+					radioButtons("clusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
+					bsTooltip("clusterProfilePlotTracks", "Which sample tracks should be displayed above the profile plot", "top"),
+					radioButtons("clusterProfilePlotSampleNames", "",
+							c("Short sample names" = "Short",
+								"Full names" = "Full",
+								"Sample ID" = "ID"), 
+							inline = T
+					),
+					bsTooltip("clusterProfilePlotSampleNames", "Should samples be labeled by a short name, full name or ID", "top"),
+					align = "center"
 				)
 			),
 			fluidRow(
@@ -244,9 +223,9 @@ shinyUI(
 					bsTooltip("clusterMembers", "Searchable, orderable table of genes in this cluster", "top")
 				)
 			)
-		),
+		)),
 
-		tabPanel("Find cluster",
+		tabPanel("Find cluster", fluidPage(
 			# for K, search for clusters by gene or product
 			fluidRow(
 				column(2, offset=5,
@@ -262,9 +241,9 @@ shinyUI(
 				dataTableOutput('clusterSearchResults'),
 				bsTooltip("clusterSearchResults", "Genes matching your search, click to view cluster", "top")
 			)
-		),
+		)),
 
-		tabPanel("My cluster",
+		tabPanel("My cluster", fluidPage(
 			# allow user to create their own cluster and run meme
 			fluidRow(
 				column(3, offset=1,
@@ -309,21 +288,27 @@ shinyUI(
 				column(12, hr())
 			),
 			fluidRow(
-				column(12, h4("My cluster", 
+				column(12, 
+					h4("My cluster", 
 						bsButton("myClusterLikeButton", label = icon("thumbs-o-up")),
 						bsTooltip("myClusterLikeButton", "Save the workflow that got you to this cluster", "top"),
-						myLikeModal("MyCluster", "cluster"),
-						radioButtons("myClusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
-						bsTooltip("myClusterProfilePlotTracks", "Which sample tracks should be displayed above the profile plot", "top"),
-						radioButtons("myClusterProfilePlotSampleNames", "",
-								c("Short sample names" = "Short",
-									"Full names" = "Full",
-									"Sample ID" = "ID"), 
-								inline = T
-						),
-						bsTooltip("myClusterProfilePlotSampleNames", "Should samples be labeled by a short name, full name or ID", "top"),
 						align = "center"
 					)
+				)
+			),
+			myLikeModal("MyCluster", "cluster"),
+			fluidRow(
+				column(6, offset = 3,
+					radioButtons("myClusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
+					bsTooltip("myClusterProfilePlotTracks", "Which sample tracks should be displayed above the profile plot", "top"),
+					radioButtons("myClusterProfilePlotSampleNames", "",
+							c("Short sample names" = "Short",
+								"Full names" = "Full",
+								"Sample ID" = "ID"), 
+							inline = T
+					),
+					bsTooltip("myClusterProfilePlotSampleNames", "Should samples be labeled by a short name, full name or ID", "top"),
+					align = "center"
 				)
 			),
 			fluidRow(
@@ -403,9 +388,9 @@ shinyUI(
 					)
 				)
 			)
-		),
+		)),
 
-		tabPanel("BLASTn",
+		tabPanel("BLASTn", fluidPage(
 			# allow user to run BLASTn
 			fluidRow(
 				column(12, h4("Enter nucleic acid sequences in FASTA format:", align="center"))
@@ -433,9 +418,9 @@ shinyUI(
 					dataTableOutput("blastnResults")
 				)
 			)
-		),
+		)),
 
-		tabPanel("BLASTp",
+		tabPanel("BLASTp", fluidPage(
 			# allow user to run BLASTp
 			fluidRow(
 				column(12, h4("Enter amino acid sequences in FASTA format:", align="center"))
@@ -453,9 +438,9 @@ shinyUI(
 					dataTableOutput("blastpResults")
 				)
 			)
-		),
+		)),
 
-		tabPanel("Likes",
+		tabPanel("Likes", fluidPage(
 			fluidRow(
 				column(12, h4("Collection of workflows for interesting results:", align="center"))
 			),
@@ -473,6 +458,6 @@ shinyUI(
 					dataTableOutput("likesTable")
 				)
 			)
-		)
+		))
 	)
 )

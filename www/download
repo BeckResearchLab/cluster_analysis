@@ -1,6 +1,8 @@
 #!/bin/bash
 
-theme=cerulean
+theme=simplex
+#yeti
+#cerulean
 
 files="bootstrap.min.css bootstrap.css variable.less bootswatch.less _variables.scss _bootswatch.scss"
 
