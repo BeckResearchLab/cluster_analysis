@@ -1,0 +1,10 @@
+#!/bin/bash
+
+theme=cerulean
+
+files="bootstrap.min.css bootstrap.css variable.less bootswatch.less _variables.scss _bootswatch.scss"
+
+for file in $files
+do
+	wget -O $file http://bootswatch.com/$theme/$file
+done
