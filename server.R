@@ -34,6 +34,7 @@ shinyServer(
 		observe({
 			# register a call on a change in any of the below
 			input$k
+			input$kLikeReasonModalClose
 
 			input$cluster
 			input$clusterDisplayMotif1GeneProfile
@@ -43,6 +44,7 @@ shinyServer(
 			input$clusterProfilePlotTracks
 			input$clusterProfilePlotSampleNames
 			input$clusterSelectedRows
+			input$clusterLikeReasonModalClose
 
 			input$searchText
 
@@ -55,12 +57,9 @@ shinyServer(
 			input$myClusterProfilePlotTracks
 			input$myClusterProfilePlotSampleNames
 			input$myClusterSelectedRows
+			input$myClusterLikeReasonModalClose
 
 			input$blastnDatabase		
-
-			input$likeKReason
-			input$likeClusterReason
-			input$likeMyClusterReason
 
 			# isolate this out so that only the above will trigger
 			isolate(session.log())
@@ -157,13 +156,13 @@ shinyServer(
 		# choose cluster tab
 		observe({
 			if (input$kLikeButton != 0) {
-				toggleModal(session, "likeKReasonModal")
+				toggleModal(session, "kLikeReasonModal")
 			}
 			if (input$clusterLikeButton != 0) {
-				toggleModal(session, "likeClusterReasonModal")
+				toggleModal(session, "clusterLikeReasonModal")
 			}
 			if (input$myClusterLikeButton != 0) {
-				toggleModal(session, "likeMyClusterReasonModal")
+				toggleModal(session, "myClusterLikeReasonModal")
 			}
 		})
 		clusts <- reactive({

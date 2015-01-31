@@ -18,7 +18,7 @@ myModal <- function (id, title, trigger, ..., href) {
 						"data-dismiss" = "modal", "Cancel"),
 					tags$button(type = "button", 
 						id = paste(id, "Close", sep=""), 
-						class = "btn btn-success sbs-action-button btn-small",
+						class = "btn btn-success action-button btn-small",
 						"data-dismiss" = "modal", "Like")
 				) 
 			)
@@ -35,15 +35,15 @@ myModal <- function (id, title, trigger, ..., href) {
 	return(mo)
 }
 
-myLikeModal <- function(tall, short) {
+myLikeModal <- function(id_prefix, description) {
 	myModal(
-		id = sprintf("like%sReasonModal", tall),
-		title = sprintf("Like %s reason", short),
+		id = sprintf("%sLikeReasonModal", id_prefix),
+		title = sprintf("Reason for liking", id_prefix),
 		trigger = "",
-		tags$p(HTML(sprintf("Why did you like this %s?", short)),
+		tags$p(HTML(sprintf("Why did you like this %s?", description)),
 			tags$div(class = "row-fluid",
-				textInput(sprintf("like%sReason", tall), "", ""),
-				tags$head(tags$style(type="text/css", sprintf("#like%sReason {width: 510px}", tall)))
+				textInput(sprintf("%sLikeReason", id_prefix), "", ""),
+				tags$head(tags$style(type="text/css", sprintf("#%sLikeReason {width: 510px}", id_prefix)))
 			)
 		)
 	)
@@ -99,7 +99,7 @@ shinyUI(
 						bsTooltip("kLikeButton", "Save the workflow that got you to this k", "right"),
 						align = "center"
 					),
-					myLikeModal("K", "k")
+					myLikeModal("k", "value of k")
 				)
 			),
 			fluidRow(
@@ -145,7 +145,7 @@ shinyUI(
 						bsTooltip("clusterLikeButton", "Save the workflow that got you to this cluster", "top"),
 						align = "center"
 					),
-					myLikeModal("Cluster", "cluster")
+					myLikeModal("cluster", "cluster")
 				)
 			),
 			fluidRow(
@@ -277,7 +277,7 @@ shinyUI(
 					)
 				)
 			),
-			myLikeModal("MyCluster", "cluster"),
+			myLikeModal("myCluster", "recruited cluster"),
 			fluidRow(
 				column(6,
 					radioButtons("myClusterProfilePlotTracks", "", names(env$samples$tracks), inline = T),
