@@ -29,6 +29,42 @@ shinyServer(
 		# or else it makes a new connection (also handles timeout)
 		db.con <- get.connection(env$mysql.database)
 
+		# session log observer
+		# trap any changes to the listed inputs and save the session state
+		observe({
+			# register a call on a change in any of the below
+			input$k
+
+			input$cluster
+			input$clusterDisplayMotif1GeneProfile
+			input$clusterDisplayMotif2GeneProfile
+			input$clusterDisplayMotif3GeneProfile
+			input$clusterDisplayMotif4GeneProfile
+			input$clusterProfilePlotTracks
+			input$clusterProfilePlotSampleNames
+			input$clusterSelectedRows
+
+			input$searchText
+
+			input$myClusterGenesUpdateButton
+			input$myClusterRecruitButton
+			input$myClusterDisplayMotif1GeneProfile
+			input$myClusterDisplayMotif2GeneProfile
+			input$myClusterDisplayMotif3GeneProfile
+			input$myClusterDisplayMotif4GeneProfile
+			input$myClusterProfilePlotTracks
+			input$myClusterProfilePlotSampleNames
+			input$myClusterSelectedRows
+
+			input$blastnDatabase		
+
+			input$likeKReason
+			input$likeClusterReason
+			input$likeMyClusterReason
+
+			# isolate this out so that only the above will trigger
+			isolate(session.log())
+		})
 		# session log handler
 		session.log <- function() {
 			# convert the input to a single line data.frame and patch
@@ -121,7 +157,7 @@ shinyServer(
 		# choose cluster tab
 		observe({
 			if (input$kLikeButton != 0) {
-				toggleModal(session, "likeKModal")
+				toggleModal(session, "likeKReasonModal")
 			}
 			if (input$clusterLikeButton != 0) {
 				toggleModal(session, "likeClusterReasonModal")
