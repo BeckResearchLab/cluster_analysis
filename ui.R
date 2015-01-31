@@ -22,17 +22,6 @@ myModal <- function (id, title, trigger, ..., href) {
 						"data-dismiss" = "modal", "Like")
 				) 
 			)
-		),
-		tags$script(paste("$('#", id, "').on('hidden.bs.modal', function (e) {
-  				$(this)
-    				.find('input,textarea,select')
-       					.val('')
-       					.end()
-    				.find('input[type=checkbox], input[type=radio]')
-       					.prop('checked', '')
-       				.end();
-				})",
-			sep = "")
 		)
 	)
 
@@ -56,6 +45,12 @@ myLikeModal <- function(id_prefix, description) {
 				textInput(sprintf("%sLikeReason", id_prefix), "", ""),
 				tags$head(tags$style(type="text/css", sprintf("#%sLikeReason {width: 510px}", id_prefix)))
 			)
+		),
+		tags$script(paste("$('#", sprintf("%sLikeReasonModal", id_prefix), "').on('hidden.bs.modal', function (e) {
+				$('#", sprintf("%sLikeReason", id_prefix), "').val('');
+				Shiny.onInputChange('", sprintf("%sLikeReason", id_prefix), "', '');
+			})",
+			sep = "")
 		)
 	)
 }
