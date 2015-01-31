@@ -25,6 +25,7 @@ shinyServer(
 		session.id <- next.session.id
 		next.session.id <<- next.session.id + 1
 		session.counter <- 0
+		likeButtonStates <- list()
 		# this function checks for an existing conection and returns it
 		# or else it makes a new connection (also handles timeout)
 		db.con <- get.connection(env$mysql.database)
@@ -121,6 +122,24 @@ shinyServer(
 
 		}
 
+		# universal observer for all like buttons
+		observe({
+			lapply(grep("LikeButton", names(input)),
+				function(n) {
+					btn <- names(input)[n]
+					mdl <- sub("Button", "ReasonModal", btn)
+					if (is.null(likeButtonStates[[btn]])) {
+						likeButtonStates[[btn]] <<- 0
+					}
+					if (input[[btn]] != likeButtonStates[[btn]]) {
+						print(c(btn, mdl))
+						toggleModal(session, mdl)
+						likeButtonStates[[btn]] <<- input[[btn]]
+					}
+				}
+			)
+		})
+
 		# all k tab
 		kdsdf <- get.distsum()
 		output$kDistSumPlot <- renderPlot({
@@ -131,11 +150,6 @@ shinyServer(
 		})
 
 		# choose k tab
-		observe({
-			if (input$kLikeButton != 0) {
-				toggleModal(session, "kLikeReasonModal")
-			}
-		})
 		kclust <- reactive({
 			env$cluster.ensemble[[input$k]]
 		})
@@ -167,11 +181,6 @@ shinyServer(
 		})
 
 		# choose cluster tab
-		observe({
-			if (input$clusterLikeButton != 0) {
-				toggleModal(session, "clusterLikeReasonModal")
-			}
-		})
 		clusts <- reactive({
 			clusters(env$cluster.ensemble[[input$k]])
 		})
@@ -478,11 +487,6 @@ shinyServer(
 					)
 					session$sendInputMessage("myClusterGenes", message)
 				})
-			}
-		})
-		observe({
-			if (input$myClusterLikeButton != 0) {
-				toggleModal(session, "myClusterLikeReasonModal")
 			}
 		})
 		my.cluster.genes <- reactive({
