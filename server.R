@@ -171,10 +171,10 @@ shinyServer(
 				focus = rowFocus,
 				display.motif.gene.profile = c(1:env$meme.nmotifs)[
 					c(
-						input$displayMotif1GeneProfile,
-						input$displayMotif2GeneProfile,
-						input$displayMotif3GeneProfile,
-						input$displayMotif4GeneProfile
+						input$clusterDisplayMotif1GeneProfile,
+						input$clusterDisplayMotif2GeneProfile,
+						input$clusterDisplayMotif3GeneProfile,
+						input$clusterDisplayMotif4GeneProfile
 					)
 				],
 				motifs = env$meme.data[[input$k]][[input$cluster]],
@@ -523,10 +523,10 @@ shinyServer(
 				focus = rowFocus,
 				display.motif.gene.profile = c(1:4)[
 					c(
-					input$displayMyMotif1GeneProfile,
-						input$displayMyMotif2GeneProfile,
-						input$displayMyMotif3GeneProfile,
-						input$displayMyMotif4GeneProfile
+						input$myClusterDisplayMotif1GeneProfile,
+						input$myClusterDisplayMotif2GeneProfile,
+						input$myClusterDisplayMotif3GeneProfile,
+						input$myClusterDisplayMotif4GeneProfile
 					)
 				],
 				motifs = my.cluster.motifs()$meme.data,

@@ -49,6 +49,28 @@ myLikeModal <- function(tall, short) {
 	)
 }
 
+columnMotif <- function(width, offset = 0, n, id_prefix="cluster") {
+	column(width = width, offset = offset,
+		fluidRow(
+			tags$b(sprintf("Motif %d", n)), style=paste("color:", env$motif.colors[n], sep=" "),
+			bsButton(size = "sm", sprintf("%sMotif%dLikeButton", id_prefix, n), label = icon("thumbs-o-up")),
+			bsTooltip(sprintf("%sMotif%dLikeButton", id_prefix, n), "Save the workflow that generated this motif", "left")
+		),
+		fluidRow(textOutput(sprintf("%sMotif%dSummary", id_prefix, n), container = span), align = "center"),
+		fluidRow(
+			textOutput(sprintf("%sMotif%dConsensus", id_prefix, n), container = span), 
+			bsTooltip(sprintf("%sMotif%dConsensus", id_prefix, n), "Top level of multilevel consensus", "left")
+		),
+		fluidRow(
+			checkboxInput(sprintf("%sDisplayMotif%dGeneProfile", id_prefix, n), "Display profile", value=F)
+		),
+		fluidRow(
+			plotOutput(sprintf("%sMotif%dPlot", id_prefix, n), height="180px")
+		),
+		align = "center"
+	)
+}
+
 shinyUI(
 	navbarPage(
 		title = env$study.title,
@@ -81,19 +103,19 @@ shinyUI(
 				)
 			),
 			fluidRow(
-				h4("Cluster sizes", align = "center"),
+				h3("Cluster sizes", align = "center"),
 				plotOutput("clusterSizePlot"),
 				bsTooltip("clusterSizePlot", "Shows the number of genes in each cluster generated for this k", "top")
 			),
 			fluidRow(
-				h4("Clustering overview", align = "center"),
+				h3("Clustering overview", align = "center"),
 				p(align = "center",
 					plotOutput("clusterOverviewPlot", width="600px", height="600px"),
 					bsTooltip("clusterOverviewPlot", "Identify clusters by color after projecting genes first two components of PCA", "right")
 				)
 			),
 			fluidRow(
-				h4("Cluster profile overview", align = "center"),
+				h3("Cluster profile overview", align = "center"),
 				uiOutput("clusterProfileOverviewPlotArea"),
 				bsTooltip("clusterProfileOverviewPlotArea", "Expression profile for genes in each cluster", "top")
 			)
@@ -118,7 +140,7 @@ shinyUI(
 			),
 			fluidRow(
 				column(12, 
-					h4("Cluster ", textOutput("cluster", container = span), 
+					h3("Cluster ", textOutput("cluster", container = span), 
 						bsButton(size = "sm", "clusterLikeButton", label = icon("thumbs-o-up")),
 						bsTooltip("clusterLikeButton", "Save the workflow that got you to this cluster", "top"),
 						align = "center"
@@ -150,74 +172,15 @@ shinyUI(
 				)
 			),
 			fluidRow(
-				column(12, h4("Motifs", align = "center"),
+				column(12, 
 					fluidRow(
-						column(width = 3,
-							p(tags$b("Motif 1"), style=paste("color:", env$motif.colors[1], sep=" "), 
-								bsButton(size = "sm", "clusterMotif1LikeButton", label = icon("thumbs-o-up")),
-								bsTooltip("clusterMotif1LikeButton", "Save the workflow that generated this motif", "right"),
-								align = "center"
-							),
-							p(textOutput("clusterMotif1Summary", container = span), 
-								align = "center"
-							),
-							p(textOutput("clusterMotif1Consensus", container = span), 
-								bsTooltip("clusterMotif1Consensus", "Top level of multilevel consensus", "right"),
-								align = "center"
-							),
-							column(width=9, offset = 3,
-								checkboxInput("displayMotif1GeneProfile", "Display profile", value=F)
-							),
-							plotOutput("clusterMotif1Plot", height="180px")
-						),
-						column(width = 3,
-							p(tags$b("Motif 2"), style=paste("color:", env$motif.colors[2], sep=" "),
-								bsButton(size = "sm", "clusterMotif2LikeButton", label = icon("thumbs-o-up")),
-								bsTooltip("clusterMotif2LikeButton", "Save the workflow that generated this motif", "right"),
-								align = "center"
-							),
-							p(textOutput("clusterMotif2Summary", container = span), align = "center"),
-							p(textOutput("clusterMotif2Consensus", container = span), 
-								bsTooltip("clusterMotif2Consensus", "Top level of multilevel consensus", "right"),
-								align = "center"
-							),
-							column(width = 9, offset = 3,
-								checkboxInput("displayMotif2GeneProfile", "Display profile", value=F)
-							),
-							plotOutput("clusterMotif2Plot", height="180px")
-						),
-						column(width = 3,
-							p(tags$b("Motif 3"), style=paste("color:", env$motif.colors[3], sep=" "),
-								bsButton(size = "sm", "clusterMotif3LikeButton", label = icon("thumbs-o-up")),
-								bsTooltip("clusterMotif3LikeButton", "Save the workflow that generated this motif", "left"),
-								align = "center"
-							),
-							p(textOutput("clusterMotif3Summary", container = span), align = "center"),
-							p(textOutput("clusterMotif3Consensus", container = span), 
-								bsTooltip("clusterMotif3Consensus", "Top level of multilevel consensus", "left"),
-								align = "center"
-							),
-							column(width = 9, offset = 3,
-								checkboxInput("displayMotif3GeneProfile", "Display profile", value=F)
-							),
-							plotOutput("clusterMotif3Plot", height="180px")
-						),
-						column(width = 3,
-							p(tags$b("Motif 4"), style=paste("color:", env$motif.colors[4], sep=" "),
-								bsButton(size = "sm", "clusterMotif4LikeButton", label = icon("thumbs-o-up")),
-								bsTooltip("clusterMotif4LikeButton", "Save the workflow that generated this motif", "left"),
-								align = "center"
-							),
-							p(textOutput("clusterMotif4Summary", container = span), align = "center"),
-							p(textOutput("clusterMotif4Consensus", container = span), 
-								bsTooltip("clusterMotif4Consensus", "Top level of multilevel consensus", "left"),
-								align = "center"
-							),
-							column(width = 9, offset = 3,
-								checkboxInput("displayMotif4GeneProfile", "Display profile", value=F)
-							),
-							plotOutput("clusterMotif4Plot", height="180px")
-						)
+						h3("Motifs", align = "center")
+					),
+					fluidRow(
+						columnMotif(width = 3, n = 1),
+						columnMotif(width = 3, n = 2),
+						columnMotif(width = 3, n = 3),
+						columnMotif(width = 3, n = 4)
 					)
 				)
 			),
@@ -241,7 +204,6 @@ shinyUI(
 				column(12, hr())
 			),
 			fluidRow(
-				h4(textOutput("clusterSearchResultSelectedRows", container = span), align = "center"),
 				dataTableOutput('clusterSearchResults'),
 				bsTooltip("clusterSearchResults", "Genes matching your search, click to view cluster", "top")
 			)
@@ -308,7 +270,7 @@ shinyUI(
 			),
 			fluidRow(
 				column(12, 
-					h4("My cluster", 
+					h3("My cluster", 
 						bsButton(size = "sm", "myClusterLikeButton", label = icon("thumbs-o-up")),
 						bsTooltip("myClusterLikeButton", "Save the workflow that got you to this cluster", "top"),
 						align = "center"
@@ -340,56 +302,12 @@ shinyUI(
 				)
 			),
 			fluidRow(
-				column(12, h4("Motifs", align = "center"),
+				column(12, h3("Motifs", align = "center"),
 					fluidRow(
-						column(width = 3,
-							p(tags$b("Motif 1"), style=paste("color:", env$motif.colors[1], sep=" "),
-								bsButton(size = "sm", "myClusterMotif1LikeButton", label = icon("thumbs-o-up")),
-								align = "center"
-							),
-							p(textOutput("myClusterMotif1Summary", container = span), align = "center"),
-							p(textOutput("myClusterMotif1Consensus", container = span), align = "center"),
-							column(width = 9, offset = 3,
-								checkboxInput("displayMyMotif1GeneProfile", "Display profile", value=F)
-							),
-							plotOutput("myClusterMotif1Plot", height="180px")
-						),
-						column(width = 3,
-							p(tags$b("Motif 2"), style=paste("color:", env$motif.colors[2], sep=" "),
-								bsButton(size = "sm", "myClusterMotif2LikeButton", label = icon("thumbs-o-up")),
-								align = "center"
-							),
-							p(textOutput("myClusterMotif2Summary", container = span), align = "center"),
-							p(textOutput("myClusterMotif2Consensus", container = span), align = "center"),
-							column(width = 9, offset = 3,
-								checkboxInput("displayMyMotif2GeneProfile", "Display profile", value=F)
-							),
-							plotOutput("myClusterMotif2Plot", height="180px")
-						),
-						column(width = 3,
-							p(tags$b("Motif 3"), style=paste("color:", env$motif.colors[3], sep=" "),
-								bsButton(size = "sm", "myClusterMotif3LikeButton", label = icon("thumbs-o-up")),
-								align = "center"
-							),
-							p(textOutput("myClusterMotif3Summary", container = span), align = "center"),
-							p(textOutput("myClusterMotif3Consensus", container = span), align = "center"),
-							column(width = 9, offset = 3,
-								checkboxInput("displayMyMotif3GeneProfile", "Display profile", value=F)
-							),
-							plotOutput("myClusterMotif3Plot", height="180px")
-						),
-						column(width = 3,
-							p(tags$b("Motif 4"), style=paste("color:", env$motif.colors[4], sep=" "),
-								bsButton(size = "sm", "myClusterMotif4LikeButton", label = icon("thumbs-o-up")),
-								align = "center"
-							),
-							p(textOutput("myClusterMotif4Summary", container = span), align = "center"),
-							p(textOutput("myClusterMotif4Consensus", container = span), align = "center"),
-							column(width = 9, offset = 3,
-								checkboxInput("displayMyMotif4GeneProfile", "Display profile", value=F)
-							),
-							plotOutput("myClusterMotif4Plot", height="180px")
-						)
+						columnMotif(width = 3, n = 1, id_prefix = "myCluster"),
+						columnMotif(width = 3, n = 2, id_prefix = "myCluster"),
+						columnMotif(width = 3, n = 3, id_prefix = "myCluster"),
+						columnMotif(width = 3, n = 4, id_prefix = "myCluster")
 					)
 				)
 			),
@@ -401,7 +319,7 @@ shinyUI(
 			),
 			fluidRow(
 				column(12,
-					h4("meme output", align = "center")
+					h3("meme output", align = "center")
 				),
 				column(12,
 					tags$code(
@@ -415,7 +333,7 @@ shinyUI(
 		tabPanel("BLASTn", fluidPage(
 			# allow user to run BLASTn
 			fluidRow(
-				column(12, h4("Enter nucleic acid sequences in FASTA format:", align = "center"))
+				column(12, h3("Enter nucleic acid sequences in FASTA format:", align = "center"))
 			),
 			fluidRow(
 				column(12,
@@ -446,7 +364,7 @@ shinyUI(
 		tabPanel("BLASTp", fluidPage(
 			# allow user to run BLASTp
 			fluidRow(
-				column(12, h4("Enter amino acid sequences in FASTA format:", align = "center"))
+				column(12, h3("Enter amino acid sequences in FASTA format:", align = "center"))
 			),
 			fluidRow(
 				column(12,
@@ -465,7 +383,7 @@ shinyUI(
 
 		tabPanel("Likes", fluidPage(
 			fluidRow(
-				column(12, h4("Collection of workflows for interesting results:", align = "center"))
+				column(12, h3("Collection of workflows for interesting results:", align = "center"))
 			),
 			fluidRow(
 				column(12, hr())
