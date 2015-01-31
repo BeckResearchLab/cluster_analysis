@@ -383,7 +383,7 @@ shinyUI(
 
 		tabPanel("Likes", fluidPage(
 			fluidRow(
-				column(12, h3("Collection of workflows for interesting results:", align = "center"))
+				column(12, h4("Result sets that were liked", align = "center"))
 			),
 			fluidRow(
 				column(12, hr())
