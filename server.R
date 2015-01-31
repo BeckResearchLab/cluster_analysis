@@ -29,8 +29,8 @@ shinyServer(
 		# or else it makes a new connection (also handles timeout)
 		db.con <- get.connection(env$mysql.database)
 
-		# session log observe handler
-		observe({
+		# session log handler
+		session.log <- function() {
 			# convert the input to a single line data.frame and patch
 			# 0. copy the reactive object
 			input.tmp <- as.list(input)
@@ -76,7 +76,7 @@ shinyServer(
 				dbWriteTable(db.con, env$mysql.log.table, input.state)
 			}
 
-		})
+		}
 
 		# all k tab
 		kdsdf <- get.distsum()
@@ -326,7 +326,10 @@ shinyServer(
 				"Motif images" = motif.img,
 				check.names = F
 			)
-		}, options = list(paging = F),
+		}, options = list(
+				paging = F,
+				columnDefs = list(list(targets = c(3) - 1, searchable = F))	# disable search on motif image
+			),
 			callback = "function(table) {
       				table.on('click.dt', 'tr', function() {
         				$(this).toggleClass('selected');
@@ -339,7 +342,8 @@ shinyServer(
 						console.log(genes);
         				Shiny.onInputChange('clusterSelectedRows', genes);
 					});
-				}"
+				}",
+			escape = F
 		)
 		output$downloadClusterData <- downloadHandler(
 			filename = function() { paste("k", input$k, "_cluster", input$cluster, ".xls", sep='') },
@@ -358,7 +362,9 @@ shinyServer(
 		# search cluster tab
 		output$clusterSearchResults <- renderDataTable({
 			getClusterSearchResults(input$k, input$searchText)
-		}, options = list(paging = F),
+		}, options = list(
+				paging = F
+			),
 			callback = "function(table) {
       				table.on('click.dt', 'tr', function() {
 						table.$('tr.selected').removeClass('selected');
@@ -562,7 +568,10 @@ shinyServer(
 				"Motif images" = motif.img,
 				check.names = F
 			)
-		}, options = list(paging = F),
+		}, options = list(
+				paging = F,
+				columnDefs = list(list(targets = c(3) - 1, searchable = F))	# disable search on motif image
+			),
 			callback = "function(table) {
       				table.on('click.dt', 'tr', function() {
         				$(this).toggleClass('selected');
@@ -575,7 +584,8 @@ shinyServer(
 						console.log(genes);
         				Shiny.onInputChange('myClusterSelectedRows', genes);
 					});
-				}"
+				}",
+			escape = F
 		)
 
 		output$myClusterMotif1Summary <- renderText({
