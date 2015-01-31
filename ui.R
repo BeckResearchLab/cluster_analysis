@@ -65,8 +65,11 @@ columnMotif <- function(width, offset = 0, n, id_prefix="cluster") {
 		fluidRow(
 			tags$b(sprintf("Motif %d", n)), style=paste("color:", env$motif.colors[n], sep=" "),
 			bsButton(size = "sm", sprintf("%sMotif%dLikeButton", id_prefix, n), label = icon("thumbs-o-up")),
-			bsTooltip(sprintf("%sMotif%dLikeButton", id_prefix, n), "Save the workflow that generated this motif", "left"),
-			myLikeModal(sprintf("%sMotif%d", id_prefix, n), "motif")
+			bsTooltip(sprintf("%sMotif%dLikeButton", id_prefix, n), "Save the workflow that generated this motif", "left")
+		),
+		fluidRow(
+			myLikeModal(sprintf("%sMotif%d", id_prefix, n), "motif"),
+			align = "left"
 		),
 		fluidRow(textOutput(sprintf("%sMotif%dSummary", id_prefix, n), container = span), align = "center"),
 		fluidRow(
