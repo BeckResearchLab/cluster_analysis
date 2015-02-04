@@ -1,6 +1,63 @@
+DROP TABLE IF EXISTS log;
+CREATE TABLE log (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`instance.pid`	INT,
+	`instance.time`	BIGINT(20),
+	`session.id`		INT,
+	`session.counter` INT,
+	k				INT,
+	kLikeReason		VARCHAR(128),
+	cluster			INT,
+	clusterLikeReason	VARCHAR(128),
+	clusterProfilePlotSampleNames VARCHAR(32),
+	clusterProfilePlotTracks		VARCHAR(32),
+	clusterDisplayMotif1GeneProfile	INT,
+	clusterDisplayMotif2GeneProfile	INT,
+	clusterDisplayMotif4GeneProfile	INT,
+	clusterDisplayMotif3GeneProfile	INT,
+	clusterMotif1LikeReason	VARCHAR(128),
+	clusterMotif2LikeReason	VARCHAR(128),
+	clusterMotif3LikeReason	VARCHAR(128),
+	clusterMotif4LikeReason	VARCHAR(128),
+	clusterSelectedRows	TEXT,
+	myClusterGenes		TEXT,
+	myClusterRecruitN	INT,
+	myClusterRecruitBy	VARCHAR(32),
+	myClusterLikeReason	VARCHAR(128),
+	myClusterProfilePlotTracks	TEXT,
+	myClusterProfilePlotSampleNames	TEXT,
+	myClusterDisplayMotif1GeneProfile INT,
+	myClusterDisplayMotif2GeneProfile INT,
+	myClusterDisplayMotif3GeneProfile INT,
+	myClusterDisplayMotif4GeneProfile INT,
+	myClusterMotif1LikeReason	VARCHAR(128),
+	myClusterMotif2LikeReason	VARCHAR(128),
+	myClusterMotif3LikeReason	VARCHAR(128),
+	myClusterMotif4LikeReason	VARCHAR(128),
+	myClusterSelectedRows	TEXT,
+	searchText		TEXT,
+	clusterSearchResultSelectedRow	TEXT,
+	`blastn.input`	TEXT,
+	blastnDatabase	VARCHAR(32),
+	`blastp.input`	TEXT,
+	row_names		CHAR(1),	# this is a field added by R, we ignore it
+	INDEX(kLikeReason),
+	INDEX(clusterLikeReason),
+	INDEX(clusterMotif1LikeReason),
+	INDEX(clusterMotif2LikeReason),
+	INDEX(clusterMotif3LikeReason),
+	INDEX(clusterMotif4LikeReason),
+	INDEX(myClusterLikeReason),
+	INDEX(myClusterMotif1LikeReason),
+	INDEX(myClusterMotif2LikeReason),
+	INDEX(myClusterMotif3LikeReason),
+	INDEX(myClusterMotif4LikeReason)
+);
+
+
 DROP VIEW IF EXISTS log_likes;
 CREATE VIEW log_likes AS
-SELECT `instance.pid`, `instance.time`, `session.id`, `session.counter`,
+SELECT id,
 			CASE
 				WHEN kLikeReason <> "" THEN "k"
 				WHEN clusterLikeReason <> "" THEN "cluster"
