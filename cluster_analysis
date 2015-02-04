@@ -17,3 +17,5 @@ R --no-save < exportMemeFasta.R
 makeblastdb -in 5G.genome.fa -hash_index -dbtype nucl
 makeblastdb -in 5G.proteome.fa -hash_index -dbtype prot
 makeblastdb -in 5G.upstream.fa -hash_index -dbtype nucl
+
+mysql cluster_analysis < init.sql
