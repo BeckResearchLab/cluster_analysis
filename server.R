@@ -8,6 +8,7 @@ library(reshape2)
 library(seqLogo)
 library(pdist)
 library(RMySQL)
+library(jsonlite)
 
 addResourcePath("cluster_analysis.dir", sprintf("%s/%s", env$dir.root, env$dir.output))
 
@@ -91,14 +92,17 @@ shinyServer(
 			}
 			# 2. make data frame
 			input.state <- data.frame(lapply(input.tmp, function(x) t(data.frame(x))))
-			# 3. add session specific data for tracing
+			# 3. drop some column names
+			input.state <- input.state[,!(names(input.state) %in% grep("Modal", names(input.state), value = T))]
+			input.state <- input.state[,!(names(input.state) %in% grep("Button", names(input.state), value = T))]
+			# 4. add session specific data for tracing
 			# add some session id info, combine all three for a unique session
 			input.state$instance.pid <- c( instance.pid )
 			input.state$instance.time <- c( instance.time )
 			input.state$session.id <- c( session.id )
 			input.state$session.counter <- c ( session.counter )
 			session.counter <<- session.counter + 1
-			# 4. handle dynamic ui inputs
+			# 5. handle dynamic ui inputs
 			if (is.null(input.state$cluster)) {
 				input.state$cluster <- c(NA)
 				transform(input.state, cluster <- as.integer(input.state$cluster))
