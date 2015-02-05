@@ -33,6 +33,8 @@ env.samples.setup <- function(file.sample.info, file.sample.ordering, file.sampl
 	res <- data.frame(assay(rld) - assay(rld)[,reference.sample])
 	# remove reference sample from count matrix
 	res <- res[, !names(res) %in% reference.sample]
+	# remove corresponding QC for reference sample if it exists
+	res <- res[, !names(res) %in% paste(reference.sample, "_QC", sep = "")]
 	#head(res)
 
 	# update our environment object
