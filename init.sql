@@ -40,7 +40,7 @@ CREATE TABLE log (
 	`blastn.input`	TEXT,
 	blastnDatabase	VARCHAR(32),
 	`blastp.input`	TEXT,
-	row_names		CHAR(1),	# this is a field added by R, we ignore it
+	likesID			INTEGER,
 	INDEX(kLikeReason),
 	INDEX(clusterLikeReason),
 	INDEX(clusterMotif1LikeReason),
@@ -51,13 +51,15 @@ CREATE TABLE log (
 	INDEX(myClusterMotif1LikeReason),
 	INDEX(myClusterMotif2LikeReason),
 	INDEX(myClusterMotif3LikeReason),
-	INDEX(myClusterMotif4LikeReason)
+	INDEX(myClusterMotif4LikeReason),
+	INDEX(likesID),
+	CONSTRAINT `SelfKey` FOREIGN KEY (`likesID`) REFERENCES `log` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 
 DROP VIEW IF EXISTS log_likes;
 CREATE VIEW log_likes AS
-SELECT id,
+SELECT id, id AS identifier,
 			CASE
 				WHEN kLikeReason <> "" THEN "k"
 				WHEN clusterLikeReason <> "" THEN "cluster"

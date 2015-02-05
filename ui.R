@@ -403,14 +403,11 @@ shinyUI(
 				column(12, hr())
 			),
 			fluidRow(
-				column(12, h2("This is under development", align = "center"))
-			),
-			fluidRow(
-				column(12, hr())
-			),
-			fluidRow(
 				column(12,
 					dataTableOutput("likesTable")
+				),
+				singleton(
+					tags$head(tags$script(src = "message-handler.js"))
 				)
 			)
 		))

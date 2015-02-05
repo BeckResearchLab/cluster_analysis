@@ -71,6 +71,8 @@ shinyServer(
 
 			input$blastnDatabase		
 
+			input$likesID
+
 			# isolate this out so that only the above will trigger
 			isolate(session.log())
 		})
@@ -118,10 +120,11 @@ shinyServer(
 			input.state$myClusterGenes <- as.character(input.state$myClusterGenes)
 
 			# if the table exists, append, else create new and either way save
+			# this is deprecated and soon to be removed as the table is created in init.sql
 			if (dbExistsTable(db.con, env$mysql.log.table)) {
-				dbWriteTable(db.con, env$mysql.log.table, input.state, append = T)
+				dbWriteTable(db.con, env$mysql.log.table, input.state, append = T, row.names = F)
 			} else {
-				dbWriteTable(db.con, env$mysql.log.table, input.state)
+				dbWriteTable(db.con, env$mysql.log.table, input.state, row.names = F)
 			}
 
 		}
@@ -136,7 +139,6 @@ shinyServer(
 						likeButtonStates[[btn]] <<- 0
 					}
 					if (input[[btn]] != likeButtonStates[[btn]]) {
-						print(c(btn, mdl))
 						toggleModal(session, mdl)
 						likeButtonStates[[btn]] <<- input[[btn]]
 					}
@@ -748,9 +750,27 @@ shinyServer(
 		}, options = list(paging=F))
 
 		# likes
+		observe({
+			if (!is.null(input$likesID)) {
+				like.state = dbGetQuery(db.con, sprintf("SELECT * FROM log WHERE id = %d;", as.integer(input$likesID)))
+				session$sendCustomMessage(type = 'restore.like.state', message = like.state)
+			}
+		})
 		output$likesTable <- renderDataTable({
-			data.frame(ID=c("1421879893"), description=c("demonstration workflow showing recruitment to My Cluster by BLASTn of motif consensus"))
-		}, options = list(paging=F))
+			likes <- dbReadTable(db.con, env$mysql.log.like.view, row.names = "id");
+			names(likes) <- c("ID", "Liked", "Reason")
+			likes
+		}, options = list(paging=F),
+			callback = "function(table) {
+      				table.on('click.dt', 'tr', function() {
+						table.$('tr.selected').removeClass('selected');
+        				$(this).toggleClass('selected');
+						var seldata = table.rows('.selected').indexes().toArray();
+						var id = table.rows('.selected').data().data()[seldata[0]][0]
+        				Shiny.onInputChange('likesID', id);
+					});
+				}"
+		)
 	}
 )
 
