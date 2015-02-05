@@ -751,8 +751,10 @@ shinyServer(
 		# likes
 		observe({
 			if (!is.null(input$likesID)) {
+cat("pulling likes\n")
 				like.state = dbGetQuery(db.con, sprintf("SELECT * FROM log WHERE id = %d;", as.integer(input$likesID)))
-				session$sendCustomMessage(type = 'restore.like.state', message = like.state)
+				session$sendInputMessage("k", list(value=20))
+				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = 1, tabControl = "#k"))
 			}
 		})
 		scan.like.buttons <- reactive({
@@ -776,7 +778,7 @@ shinyServer(
 						table.$('tr.selected').removeClass('selected');
         				$(this).toggleClass('selected');
 						var seldata = table.rows('.selected').indexes().toArray();
-						var id = table.rows('.selected').data().data()[seldata[0]][0]
+						var id = table.rows('.selected').data().data()[seldata[0]][0];
         				Shiny.onInputChange('likesID', id);
 					});
 				}"
