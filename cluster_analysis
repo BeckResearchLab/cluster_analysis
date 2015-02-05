@@ -6,9 +6,11 @@
 # create a background model from the entire genome
 #~/meme/bin/fasta-get-markov -m 8 5G.genome.fa > 5G.genome.bfile
 # new way, skip ATG and do 300 bases
-~/bcutil/bcutil get_upstream 5G.genbank.gff 5G.genome.fa 1 301 8 > 5G.upstream.tab
+#~/bcutil/bcutil get_upstream 5G.genbank.gff 5G.genome.fa 1 301 8 > 5G.upstream.tab
+# newest way, skip ATG but just do 150 bases
+~/bcutil/bcutil get_upstream 5G.genbank.gff 5G.genome.fa 1 151 8 > 5G.upstream.tab
 # create a background model from just the upstream intergenic sequences
-awk -F'\t' '{ printf(">%s\t%s\n", $1, $2) }' 5G.upstream.tab > 5G.upstream.fa
+awk -F'\t' '{ if (line > 3) printf(">%s\n%s\n", $1, $2); ++line }' 5G.upstream.tab > 5G.upstream.fa
 ~/meme/bin/fasta-get-markov -m 8 5G.upstream.fa > 5G.upstream.bfile
 
 # create fasta files, this will also initiate the environment cache
