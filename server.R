@@ -80,7 +80,7 @@ shinyServer(
 		session.log <- function() {
 			# convert the input to a single line data.frame and patch
 			# 0. copy the reactive object
-			input.tmp <- as.list(input)
+			input.tmp <- reactiveValuesToList(input)
 			# 1. flatten lists
 			if (is.null(input.tmp$clusterSelectedRows)) {
 				input.tmp$clusterSelectedRows <- ""
@@ -126,7 +126,6 @@ shinyServer(
 			} else {
 				dbWriteTable(db.con, env$mysql.log.table, input.state, row.names = F)
 			}
-
 		}
 
 		# universal observer for all like buttons
@@ -756,7 +755,18 @@ shinyServer(
 				session$sendCustomMessage(type = 'restore.like.state', message = like.state)
 			}
 		})
+		scan.like.buttons <- reactive({
+			lapply(grep("LikeButton", names(input)),
+				function(n) {
+					btn <- names(input)[n]
+					input[[btn]]
+				}
+			)
+		})
 		output$likesTable <- renderDataTable({
+			# monitor like buttons to reload table
+			scan.like.buttons()
+			# reload table
 			likes <- dbReadTable(db.con, env$mysql.log.like.view, row.names = "id");
 			names(likes) <- c("ID", "Liked", "Reason")
 			likes
