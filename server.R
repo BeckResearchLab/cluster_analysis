@@ -752,9 +752,43 @@ shinyServer(
 		observe({
 			if (!is.null(input$likesID)) {
 cat("pulling likes\n")
-				like.state = dbGetQuery(db.con, sprintf("SELECT * FROM log WHERE id = %d;", as.integer(input$likesID)))
-				session$sendInputMessage("k", list(value=20))
-				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = 1, tabControl = "#k"))
+				like.state <- dbGetQuery(db.con, sprintf("SELECT * FROM log WHERE id = %d;", as.integer(input$likesID)))
+#clusterSelectedRows
+				tabNo <- 1
+				tabControl <- "#k"
+				update.my.cluster <- F
+				lapply(names(like.state), function(input.name) {
+					value <- NULL
+					if (input.name %in% c("id", "instance.pid", "instance.time", "session.id", "session.counter", "likesID")) {
+						return(NULL)
+					} else if (input.name %in% c("clusterSelectedRows", "myClusterSelectedRows")) {
+						value <- strsplit(like.state[1, input.name], ",", fixed = T)[[1]]
+						#print(value)
+					} else {
+						value <- like.state[1, input.name]
+					}
+					if (length(grep("LikeReason", input.name)) > 0) {
+						if (substr(input.name, 1, 1) == "k" && value != "") {
+							tabNo <<- 1
+							tabControl <<- "#k"
+						} else if (substr(input.name, 1, 7) == "cluster" && value != "") {
+							tabNo <<- 2
+							tabControl <<- "#cluster"
+						} else if (substr(input.name, 1, 9) == "myCluster" && value != "") {
+							tabNo <<- 4
+							tabControl <<- "#myClusterRecruitN"
+							update.my.cluster <<- T
+						}
+						return(NULL)
+					}
+					#print(input.name)
+					session$sendInputMessage(input.name, list(value = value))
+				})
+				if (!identical(update.my.cluster, F)) {
+					print("trying to send button click")
+					session$sendInputMessage("myClusterGenesUpdateButton", list(value = 1))
+				}
+				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = tabNo, tabControl = tabControl))
 			}
 		})
 		scan.like.buttons <- reactive({
