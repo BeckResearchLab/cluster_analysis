@@ -118,6 +118,14 @@ shinyServer(
 				input.state$myClusterGenes <- ""
 			}
 			input.state$myClusterGenes <- as.character(input.state$myClusterGenes)
+			# convert F/T to 0/1
+			lapply(names(input.state), function(input.name) {
+				if (identical(input.state[1, input.name], F)) {
+					input.state[, input.name] <<- as.integer(input.state[,input.name])
+				} else if (identical(input.state[1, input.name], T)) {
+					input.state[, input.name] <<- as.integer(input.state[,input.name])
+				}
+			})
 
 			# if the table exists, append, else create new and either way save
 			# this is deprecated and soon to be removed as the table is created in init.sql
@@ -781,7 +789,7 @@ cat("pulling likes\n")
 						}
 						return(NULL)
 					}
-					#print(input.name)
+					print(c(input.name, value))
 					session$sendInputMessage(input.name, list(value = value))
 				})
 				if (!identical(update.my.cluster, F)) {
@@ -791,6 +799,7 @@ cat("pulling likes\n")
 				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = tabNo, tabControl = tabControl))
 			}
 		})
+		# like button monitor
 		scan.like.buttons <- reactive({
 			lapply(grep("LikeButton", names(input)),
 				function(n) {
