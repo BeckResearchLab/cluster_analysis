@@ -17,7 +17,7 @@ env$reference.sample <- "FM23_TR3"
 
 # settings for upstream data
 env$upstream.start <- -1
-env$upstream.end <- -301
+env$upstream.end <- -151
 
 # pathes
 env$dir.root <- "/Users/dacb/work/5G/cluster_analysis"
