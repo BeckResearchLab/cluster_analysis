@@ -42,7 +42,7 @@ env.assemble <- function(include.meme = T) {
 		cat("reading cluster ensemble cache...\n")
 		env$cluster.ensemble <- readRDS(env$file.env.cluster.ensemble.cache)
 		} else {
-		env$cluster.ensemble <- env.cluster.ensemble.setup(flexclust.seed, env$samples$log.ratio, env$flexclust.k.values, env$flexclust.nrep, env$flexclust.cores)
+		env$cluster.ensemble <- env.cluster.ensemble.setup(env$flexclust.seed, env$samples$log.ratio, env$flexclust.k.values, env$flexclust.nrep, env$flexclust.cores)
 	saveRDS(env$cluster.ensemble, env$file.env.cluster.ensemble.cache)
 	}
 	if (include.meme) {
