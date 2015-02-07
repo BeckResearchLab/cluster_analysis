@@ -20,6 +20,15 @@ instance.pid <- Sys.getpid()
 instance.time <- as.integer(Sys.time())
 next.session.id <- 0
 
+renderRestoration <- function(expr, env = parent.frame(), quoted = F) {
+	func <- exprToFunction(expr)
+	function() {
+		func() 
+		# return the selected snapshot to the client side
+		# Shiny will automatically wrap it into JSOn
+	}
+}
+
 shinyServer(
 	function(input, output, session) {
 		# these help us create a unique session id for tracking
@@ -395,8 +404,8 @@ shinyServer(
 				columnDefs = list(list(targets = c(3) - 1, searchable = F))	# disable search on motif image
 			),
 			callback = "function(table) {
-      				table.on('click.dt', 'tr', function() {
-        				$(this).toggleClass('selected');
+	  				table.on('click.dt', 'tr', function() {
+						$(this).toggleClass('selected');
 						var seldata = table.rows('.selected').indexes().toArray();
 						var data = table.rows('.selected').data().data();
 						var genes = [];
@@ -404,7 +413,7 @@ shinyServer(
 							genes.push(data[seldata[sel]][0])
 						}
 						console.log(genes);
-        				Shiny.onInputChange('clusterSelectedRows', genes);
+						Shiny.onInputChange('clusterSelectedRows', genes);
 					});
 				}",
 			escape = F
@@ -430,9 +439,9 @@ shinyServer(
 				paging = F
 			),
 			callback = "function(table) {
-      				table.on('click.dt', 'tr', function() {
+	  				table.on('click.dt', 'tr', function() {
 						table.$('tr.selected').removeClass('selected');
-        				$(this).toggleClass('selected');
+						$(this).toggleClass('selected');
 						var seldata = table.rows('.selected').indexes().toArray();
 						var data = table.rows('.selected').data().data();
 						var genes = [];
@@ -440,8 +449,8 @@ shinyServer(
 							genes.push(data[seldata[sel]][0])
 						}
 						console.log(genes);
-        				Shiny.onInputChange('clusterSearchResultSelectedRow', genes);
-        				Shiny.onInputChange('clusterSelectedRows', genes);
+						Shiny.onInputChange('clusterSearchResultSelectedRow', genes);
+						Shiny.onInputChange('clusterSelectedRows', genes);
 
 						 tabs = $('.nav li')
 					 	 tabs.each(function() {
@@ -462,7 +471,7 @@ shinyServer(
 		)
 		output$clusterSearchResultSelectedRows <- renderText({
 			csr <- getClusterSearchResults(input$k, input$searchText)
-    		paste(c('Cluster:', csr[input$clusterSearchResultSelectedRow, "Cluster"]), collapse = ' ')
+			paste(c('Cluster:', csr[input$clusterSearchResultSelectedRow, "Cluster"]), collapse = ' ')
   		})
 		# My cluster tab
 		observe({
@@ -525,20 +534,20 @@ shinyServer(
 			if (length(training.set$length) > 1) {
 				clust.seqs.upstream <- env$genes$upstream.seqs[mcg,]
 				dir <- dir.my.cluster(env$dir.output, env$dir.my.cluster, instance.pid, instance.time, session.id)
-                dir.create(dir, recursive = T, showWarnings = F)
-                fasta.file <- paste(dir, env$file.upstream.fa, sep="/")
-                if (file.exists(fasta.file)) {
-                       file.remove(fasta.file);
-                }
-                for (k in 1:length(rownames(clust.seqs.upstream))) {
-                        if (!is.na(clust.seqs.upstream$sequence[k])) {
-                                cat(paste(">", rownames(clust.seqs.upstream)[k], "\n", sep="") , file=fasta.file, append=T)
-                                cat(paste(clust.seqs.upstream$sequence[k], "\n", sep="") , file=fasta.file, append=T)
-                        }
-                }
+				dir.create(dir, recursive = T, showWarnings = F)
+				fasta.file <- paste(dir, env$file.upstream.fa, sep="/")
+				if (file.exists(fasta.file)) {
+					   file.remove(fasta.file);
+				}
+				for (k in 1:length(rownames(clust.seqs.upstream))) {
+						if (!is.na(clust.seqs.upstream$sequence[k])) {
+								cat(paste(">", rownames(clust.seqs.upstream)[k], "\n", sep="") , file=fasta.file, append=T)
+								cat(paste(clust.seqs.upstream$sequence[k], "\n", sep="") , file=fasta.file, append=T)
+						}
+				}
 
 				meme.file <- paste(dir, env$file.meme.txt, sep="/")
-                meme.cmd <- paste(env$path.to.meme, fasta.file, "-nmotifs", env$meme.nmotifs, env$meme.base.args, "-oc", dir, "-bfile", 
+				meme.cmd <- paste(env$path.to.meme, fasta.file, "-nmotifs", env$meme.nmotifs, env$meme.base.args, "-oc", dir, "-bfile", 
 					env$file.meme.bfile,
 					">&", 
 					meme.file
@@ -636,8 +645,8 @@ shinyServer(
 				columnDefs = list(list(targets = c(3) - 1, searchable = F))	# disable search on motif image
 			),
 			callback = "function(table) {
-      				table.on('click.dt', 'tr', function() {
-        				$(this).toggleClass('selected');
+	  				table.on('click.dt', 'tr', function() {
+						$(this).toggleClass('selected');
 						var seldata = table.rows('.selected').indexes().toArray();
 						var data = table.rows('.selected').data().data();
 						var genes = [];
@@ -645,7 +654,7 @@ shinyServer(
 							genes.push(data[seldata[sel]][0])
 						}
 						console.log(genes);
-        				Shiny.onInputChange('myClusterSelectedRows', genes);
+						Shiny.onInputChange('myClusterSelectedRows', genes);
 					});
 				}",
 			escape = F
@@ -757,11 +766,18 @@ shinyServer(
 		}, options = list(paging=F))
 
 		# likes
+		output$input_container <- renderRestoration({
+			"hai!"
+		})
 		observe({
 			if (!is.null(input$likesID)) {
 cat("pulling likes\n")
 				like.state <- dbGetQuery(db.con, sprintf("SELECT * FROM log WHERE id = %d;", as.integer(input$likesID)))
 #clusterSelectedRows
+				
+				session$sendCustomMessage(type = 'testMsg', message = list())
+
+if (F) {
 				tabNo <- 1
 				tabControl <- "#k"
 				update.my.cluster <- F
@@ -794,10 +810,11 @@ cat("pulling likes\n")
 				})
 				if (!identical(update.my.cluster, F)) {
 					print("trying to send button click")
-					session$sendInputMessage("myClusterGenesUpdateButton", list(value = 1))
+					session$sendCustomMessage("myClusterGenesUpdateButtonClick", list(value = 1))
 				}
 				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = tabNo, tabControl = tabControl))
 			}
+}
 		})
 		# like button monitor
 		scan.like.buttons <- reactive({
@@ -817,12 +834,12 @@ cat("pulling likes\n")
 			likes
 		}, options = list(paging=F),
 			callback = "function(table) {
-      				table.on('click.dt', 'tr', function() {
+	  				table.on('click.dt', 'tr', function() {
 						table.$('tr.selected').removeClass('selected');
-        				$(this).toggleClass('selected');
+						$(this).toggleClass('selected');
 						var seldata = table.rows('.selected').indexes().toArray();
 						var id = table.rows('.selected').data().data()[seldata[0]][0];
-        				Shiny.onInputChange('likesID', id);
+						Shiny.onInputChange('likesID', id);
 					});
 				}"
 		)
