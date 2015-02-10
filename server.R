@@ -767,7 +767,7 @@ shinyServer(
 
 		# likes
 		output$input_container <- renderRestoration({
-			"hai!"
+			list(k="20", cluster="2", clusterDisplayMotif1GeneProfile=T)
 		})
 		observe({
 			if (!is.null(input$likesID)) {

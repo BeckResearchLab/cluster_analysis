@@ -82,6 +82,7 @@ columnMotif <- function(width, offset = 0, n, id_prefix="cluster") {
 }
 
 shinyUI(
+fluidPage(tags$div(id="input_container", 
 	navbarPage(
 		title = env$study.title,
 		theme = "bootstrap.css",
@@ -413,3 +414,4 @@ shinyUI(
 		))
 	)
 )
+))
