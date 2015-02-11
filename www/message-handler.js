@@ -55,7 +55,7 @@ var restoreBinding = new Shiny.OutputBinding();
 			// very rudimentary sanity check
 			if ($.isPlainObject(data) && data.hasOwnProperty('k')) {
 				restore_snapshot(el, data);
-				alert("Snapshot restored!");
+				alert("Like restored, enjoy.");
 			}
 		}
 	});
