@@ -773,11 +773,10 @@ shinyServer(
 			if (!is.null(input$likesID)) {
 cat("pulling likes\n")
 				like.state <- dbGetQuery(db.con, sprintf("SELECT * FROM log WHERE id = %d;", as.integer(input$likesID)))
-#clusterSelectedRows
 				
-				session$sendCustomMessage(type = 'testMsg', message = list())
+#				session$sendCustomMessage(type = 'testMsg', message = list())
 
-if (F) {
+#if (F) {
 				tabNo <- 1
 				tabControl <- "#k"
 				update.my.cluster <- F
@@ -814,7 +813,7 @@ if (F) {
 				}
 				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = tabNo, tabControl = tabControl))
 			}
-}
+#}
 		})
 		# like button monitor
 		scan.like.buttons <- reactive({
