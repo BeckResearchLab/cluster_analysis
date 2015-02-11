@@ -35,6 +35,8 @@ shinyServer(
 		# this function checks for an existing conection and returns it
 		# or else it makes a new connection (also handles timeout)
 		db.con <- get.connection(env$mysql.database)
+		# exchange object between observe and reactive output
+		like.state <- list()
 
 		# session log observer
 		# trap any changes to the listed inputs and save the session state
@@ -772,23 +774,24 @@ shinyServer(
 		output$inputContainer <- renderRestoration({
 			if (!is.null(input$likesID)) {
 				#return(list(k="20", cluster="2", clusterDisplayMotif1GeneProfile=T))
-				return(list(k="20", 
-						cluster="2", 
-						clusterDisplayMotif1GeneProfile=T, 
-						#myClusterGenes="MBURv2_160301\nMBURv2_160300\nMBURv2_160302",
-						myClusterRecruit=4
-					)
-				)
+#				return(list(k="20", 
+#						cluster="2", 
+#						clusterDisplayMotif1GeneProfile=T, 
+#						#myClusterGenes="MBURv2_160301\nMBURv2_160300\nMBURv2_160302",
+#						myClusterRecruit=4
+#					)
+#				)
+#				return(as.list(like.state))
+				return(list(k=like.state$k[1]))
 			}
 			return(list())
 		})
 		observe({
 			if (!is.null(input$likesID)) {
 cat("pulling likes\n")
-				like.state <- dbGetQuery(db.con, sprintf("SELECT * FROM log WHERE id = %d;", as.integer(input$likesID)))
+				like.state <<- dbGetQuery(db.con, sprintf("SELECT * FROM log WHERE id = %d;", as.integer(input$likesID)))
 #updateTextInput(session, inputId = "myClusterGenes", value = like.state[1, "myClusterGenes"])
 				
-if (1) {
 				tabNo <- 1
 				tabControl <- "#k"
 				update.my.cluster <- F
@@ -817,14 +820,13 @@ if (1) {
 						return(NULL)
 					}
 # temporary fix to force only restoration of myCluster
-					if (!is.na(pmatch("myCluster", input.name))) {
+#					if (!is.na(pmatch("myCluster", input.name))) {
 						print(c(input.name, value))
 						session$sendInputMessage(input.name, list(value = value))
-					}
+#					}
 				})
 				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = tabNo, tabControl = tabControl))
 			}
-}
 		})
 		# like button monitor
 		scan.like.buttons <- reactive({
