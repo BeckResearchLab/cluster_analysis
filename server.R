@@ -12,10 +12,6 @@ library(jsonlite)
 
 addResourcePath("cluster_analysis.dir", sprintf("%s/%s", env$dir.root, env$dir.output))
 
-# demo genes, could also just fetch first 4 (4 gets the kCDF display)
-# but these 3 make for a nice demo
-default.my.cluster.genes <- c("MBURv2_160308", "MBURv2_160304", "MBURv2_160312")
-
 instance.pid <- Sys.getpid()
 instance.time <- as.integer(Sys.time())
 next.session.id <- 0
@@ -515,12 +511,16 @@ shinyServer(
 			input$myClusterGenesUpdateButton
 
 			isolate({
-			if (!is.null(input$myClusterGenes)) {
-				genes <- unlist(strsplit(input$myClusterGenes, "\n", fixed=T))
-				valid.genes <- genes %in% rownames(env$samples$log.ratio)
-				return(genes[valid.genes])
-			}
-			return(default.my.cluster.genes)
+				print("my.cluster.genes")
+				print(input$likesID)
+				if (!is.null(input$myClusterGenes)) {
+					print(input$myClusterGenes)
+					genes <- unlist(strsplit(input$myClusterGenes, "\n", fixed=T))
+					valid.genes <- genes %in% rownames(env$samples$log.ratio)
+					return(genes[valid.genes])
+				}
+				print("no default...")
+				return("")
 			})
 		})
 		my.cluster.motifs <- reactive({
@@ -570,9 +570,6 @@ shinyServer(
 				return(list("meme.data" = motifs, "meme.sites" = meme.sites))
 			}
 			return(NULL)
-		})
-		output$myClusterGenesUI <- renderUI({
-			tags$textarea(id="myClusterGenes", rows=6, cols=32, paste(my.cluster.genes(), collapse="\n"), style="display: block; margin-left: auto; margin-right: auto;")
 		})
 		output$myClusterProfilePlot <- renderPlot({
 			if (is.null(input$myClusterSelectedRows)) {
@@ -804,14 +801,17 @@ cat("pulling likes\n")
 						}
 						return(NULL)
 					}
-					print(c(input.name, value))
-					session$sendInputMessage(input.name, list(value = value))
+# temporary fix to force only restoration of myCluster
+					if (!is.na(pmatch("myCluster", input.name))) {
+						print(c(input.name, value))
+						session$sendInputMessage(input.name, list(value = value))
+					}
 				})
+				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = tabNo, tabControl = tabControl))
 				if (!identical(update.my.cluster, F)) {
 					print("trying to send button click")
 					session$sendCustomMessage("myClusterGenesUpdateButtonClick", list(value = 1))
 				}
-				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = tabNo, tabControl = tabControl))
 			}
 #}
 		})

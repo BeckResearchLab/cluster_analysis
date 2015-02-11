@@ -1,6 +1,10 @@
 library(shiny)
 library(shinyBS)
 
+# demo genes, could also just fetch first 4 (4 gets the kCDF display)
+# but these 3 make for a nice demo
+default.my.cluster.genes <- c("MBURv2_160308", "MBURv2_160304", "MBURv2_160312")
+
 myModal <- function (id, title, trigger, ..., href) {
 	mo <- tags$div(class = "modal sbs-modal fade", id = id, 
 		'data-trigger' = trigger, tabindex="-1", role="dialog", 
@@ -78,6 +82,19 @@ columnMotif <- function(width, offset = 0, n, id_prefix="cluster") {
 			plotOutput(sprintf("%sMotif%dPlot", id_prefix, n), height="180px")
 		),
 		align = "center"
+	)
+}
+
+inputTextarea <- function(inputId, value="", nrows, ncols) {
+	tagList(
+		singleton(tags$head(tags$script(src = "textarea.js"))),
+		tags$textarea(id = inputId,
+					class = "inputtextarea",
+					rows = nrows,
+					cols = ncols,
+					as.character(value),
+					style="display: block; margin-left: auto; margin-right: auto;"
+			)
 	)
 }
 
@@ -236,8 +253,8 @@ shinyUI(
 					),
 					fluidRow(
 						column(12, 
-							uiOutput("myClusterGenesUI"),
-							bsTooltip("myClusterGenesUI", "Enter a list of locus tags to include in the cluster, one per line", "right"),
+							inputTextarea("myClusterGenes", paste(default.my.cluster.genes, collapse="\n"), 6, 32),
+							bsTooltip("myClusterGenes", "Enter a list of locus tags to include in the cluster, one per line", "right"),
 							align = "center"
 						)
 					),
