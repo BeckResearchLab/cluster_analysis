@@ -823,10 +823,6 @@ if (1) {
 					}
 				})
 				session$sendCustomMessage(type = 'setActiveTab', message = list(tabNo = tabNo, tabControl = tabControl))
-				if (!identical(update.my.cluster, F)) {
-					print("trying to send button click")
-					session$sendCustomMessage("myClusterGenesUpdateButtonClick", list(value = 1))
-				}
 			}
 }
 		})
