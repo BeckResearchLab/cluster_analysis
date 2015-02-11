@@ -21,12 +21,6 @@ Shiny.addCustomMessageHandler("setActiveTab",
 	}
 );
 
-Shiny.addCustomMessageHandler("myClusterGenesUpdateButtonClick",
-	function(message) {
-		$("#myClusterGenesUpdateButton").click();
-	}
-);
-
 var restore_snapshot = function(el, input_params) {
 		/* Shiny.inputBindings.getBindings() return the InputBinding instances
 		   for every (native) input type that Shiny supports (selectInput, textInput,
