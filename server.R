@@ -508,23 +508,29 @@ shinyServer(
 			}
 		})
 		my.cluster.genes <- reactive({
-			input$myClusterGenesUpdateButton
+			if (input$myClusterGenesUpdateButton != 0) {
 
-			isolate({
-				print("my.cluster.genes")
-				print(input$likesID)
-				if (!is.null(input$myClusterGenes)) {
-					print(input$myClusterGenes)
-					genes <- unlist(strsplit(input$myClusterGenes, "\n", fixed=T))
-					valid.genes <- genes %in% rownames(env$samples$log.ratio)
-					return(genes[valid.genes])
-				}
-				print("no default...")
-				return("")
-			})
+				isolate({
+					print("my.cluster.genes")
+					if (input$myClusterGenes == "" && !is.null(input$likesID)) {
+						print(as.integer(input$likesID))
+					} else if (!is.null(input$myClusterGenes)) {
+						print(input$myClusterGenes)
+						genes <- unlist(strsplit(input$myClusterGenes, "\n", fixed=T))
+						valid.genes <- genes %in% rownames(env$samples$log.ratio)
+						return(genes[valid.genes])
+					}
+					print("no default...")
+					return(c())
+				})
+			}
 		})
 		my.cluster.motifs <- reactive({
 			mcg <- my.cluster.genes()
+
+			if (length(mcg) < 1) {
+				return(NULL)
+			}
 
 			# setup the training set data frame to be validated in memeParse
 			training.set <- data.frame(length=env$genes$upstream.seqs[mcg, "uplength"], row.names = mcg)
@@ -763,17 +769,26 @@ shinyServer(
 		}, options = list(paging=F))
 
 		# likes
-		output$input_container <- renderRestoration({
-			list(k="20", cluster="2", clusterDisplayMotif1GeneProfile=T)
+		output$inputContainer <- renderRestoration({
+			if (!is.null(input$likesID)) {
+				#return(list(k="20", cluster="2", clusterDisplayMotif1GeneProfile=T))
+				return(list(k="20", 
+						cluster="2", 
+						clusterDisplayMotif1GeneProfile=T, 
+						#myClusterGenes="MBURv2_160301\nMBURv2_160300\nMBURv2_160302",
+						myClusterRecruit=4
+					)
+				)
+			}
+			return(list())
 		})
 		observe({
 			if (!is.null(input$likesID)) {
 cat("pulling likes\n")
 				like.state <- dbGetQuery(db.con, sprintf("SELECT * FROM log WHERE id = %d;", as.integer(input$likesID)))
+#updateTextInput(session, inputId = "myClusterGenes", value = like.state[1, "myClusterGenes"])
 				
-#				session$sendCustomMessage(type = 'testMsg', message = list())
-
-#if (F) {
+if (1) {
 				tabNo <- 1
 				tabControl <- "#k"
 				update.my.cluster <- F
@@ -813,7 +828,7 @@ cat("pulling likes\n")
 					session$sendCustomMessage("myClusterGenesUpdateButtonClick", list(value = 1))
 				}
 			}
-#}
+}
 		})
 		# like button monitor
 		scan.like.buttons <- reactive({

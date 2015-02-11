@@ -27,12 +27,6 @@ Shiny.addCustomMessageHandler("myClusterGenesUpdateButtonClick",
 	}
 );
 
-Shiny.addCustomMessageHandler("testMsg",
-	function(message) {
-		console.log("hai!")
-	}
-);
-
 var restore_snapshot = function(el, input_params) {
 		/* Shiny.inputBindings.getBindings() return the InputBinding instances
 		   for every (native) input type that Shiny supports (selectInput, textInput,
@@ -51,12 +45,14 @@ var restore_snapshot = function(el, input_params) {
 				}
 			});
 		});
+		// force some updates
+		$("#myClusterGenesUpdateButton").click();
 	}
 
 var restoreBinding = new Shiny.OutputBinding();
 	$.extend(restoreBinding, {
 		find: function(scope) {
-			return $(scope).find("#input_container");
+			return $(scope).find("#inputContainer");
 		},
 		renderValue: function(el, data) {
 			console.log("data:");

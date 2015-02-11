@@ -85,20 +85,8 @@ columnMotif <- function(width, offset = 0, n, id_prefix="cluster") {
 	)
 }
 
-inputTextarea <- function(inputId, value="", nrows, ncols) {
-	tagList(
-		singleton(tags$head(tags$script(src = "textarea.js"))),
-		tags$textarea(id = inputId,
-					class = "inputtextarea",
-					rows = nrows,
-					cols = ncols,
-					as.character(value),
-					style="display: block; margin-left: auto; margin-right: auto;"
-			)
-	)
-}
-
 shinyUI(
+fluidPage(tags$div(id="inputContainer", 
 	navbarPage(
 		title = env$study.title,
 		theme = "bootstrap.css",
@@ -253,7 +241,7 @@ shinyUI(
 					),
 					fluidRow(
 						column(12, 
-							inputTextarea("myClusterGenes", paste(default.my.cluster.genes, collapse="\n"), 6, 32),
+							tags$textarea(id="myClusterGenes", rows=6, cols=32, style="display: block; margin-left: auto; margin-right: auto;"),
 							bsTooltip("myClusterGenes", "Enter a list of locus tags to include in the cluster, one per line", "right"),
 							align = "center"
 						)
@@ -430,3 +418,4 @@ shinyUI(
 		))
 	)
 )
+))
